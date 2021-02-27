@@ -39,6 +39,7 @@ public class DanSMP extends JavaPlugin {
     }
 
     private void initializeCharacters() {
+        // TODO: Have these stored in a JSON file or something, yikes
         ActorRegistry.addActor("Angela", "AkinaS0");
         ActorRegistry.addActor("Max", "ALCleveland");
         ActorRegistry.addActor("Amaan", "AmaanKillzAll");
@@ -74,6 +75,7 @@ public class DanSMP extends JavaPlugin {
     }
 
     private void initializeAbilities() {
+        // TODO: Have these stored in JSON files too, my goodness
         AbilityRegistry.registerAbility("Arleycht", CreepyManAbility.class, this);
     }
 

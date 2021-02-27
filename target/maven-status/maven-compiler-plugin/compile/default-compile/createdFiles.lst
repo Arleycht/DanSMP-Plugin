@@ -1,0 +1,5 @@
+io\github\arleycht\SMP\Abilities\Ability.class
+io\github\arleycht\SMP\Abilities\AbilityRegistry.class
+io\github\arleycht\SMP\DanSMP.class
+io\github\arleycht\SMP\Abilities\KnightAbility.class
+io\github\arleycht\SMP\Commands\SMPCommandCompletion.class

@@ -63,7 +63,7 @@ public class CreepyManAbility extends Ability {
         Entity target = event.getTarget();
 
         // Make creepers ignore the ability owner
-        if (isOwner(target) && entity instanceof Creeper) {
+        if (isOwner(target.getUniqueId()) && entity instanceof Creeper) {
             event.setCancelled(true);
         }
     }

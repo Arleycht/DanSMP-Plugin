@@ -2,6 +2,7 @@ package io.github.arleycht.SMP.Characters;
 
 import com.google.gson.Gson;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -9,13 +10,22 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public final class ActorRegistry {
+	private static final int REQUEST_LIMIT = 300;
+	private static final long REQUEST_COUNT_RESET_INTERVAL_MS = 1000L * 60L * 10L;
 	private static final String UUID_REQUEST_URL = "https://api.mojang.com/users/profiles/minecraft/%s";
 	private static final String NAME_REQUEST_URL = "https://api.mojang.com/user/profiles/%s/names";
-	
+
+	private static final HashMap<UUID, String> UUID_USERNAME_CACHE = new HashMap<>();
 	private static final ArrayList<Actor> ACTORS = new ArrayList<>();
+
+	private static Plugin plugin = null;
+	private static int requestCount = 0;
+	private static long requestResetTime = 0L;
 	
 	static class NameResponse {
 		//public String name;
@@ -32,7 +42,6 @@ public final class ActorRegistry {
 	}
 	
 	public static Actor addActor(String realName, String username) {
-		UUID uuid = getUUIDFromUsername(username);
 		Actor actor = new Actor(realName, username);
 
 		Bukkit.getLogger().info(String.format("Adding character '%s'", actor.toString()));
@@ -42,15 +51,17 @@ public final class ActorRegistry {
 			Bukkit.getLogger().warning("Real name was not provided!");
 		}
 		
-		// Verify username exists
-		if (uuid == null) {
-			String msg = String.format("Username '%s' not found!", username);
-			Bukkit.getLogger().severe(msg);
-		}
-		
 		ACTORS.add(actor);
 
 		return actor;
+	}
+
+	public static void setPlugin(Plugin plugin) {
+		if (ActorRegistry.plugin != null) {
+			Bukkit.getLogger().warning("Plugin was already defined in ActorRegistry!");
+		}
+
+		ActorRegistry.plugin = plugin;
 	}
 
 	public static Actor getCharacterFromRealName(String realName) {
@@ -73,6 +84,10 @@ public final class ActorRegistry {
 		return null;
 	}
 
+	public static Plugin getPlugin() {
+		return plugin;
+	}
+
 	public static String hyphenateUUIDString(String uuidString) {
 		if (uuidString == null) {
 			return null;
@@ -86,8 +101,13 @@ public final class ActorRegistry {
 			return null;
 		}
 
+		// Return cached result, if any
+		if (UUID_USERNAME_CACHE.containsKey(uuid)) {
+			return UUID_USERNAME_CACHE.get(uuid);
+		}
+
 		String url = String.format(NAME_REQUEST_URL, uuid.toString());
-		String text = getResponseString(url);
+		String text = getResponseFromUrl(url);
 		
 		if (text != null)
 		{
@@ -96,7 +116,11 @@ public final class ActorRegistry {
 			NameHistoryEntry[] response = gson.fromJson(text, NameHistoryEntry[].class);
 
 			if (response.length > 0) {
-				return response[response.length - 1].name;
+				String username = response[response.length - 1].name;
+
+				UUID_USERNAME_CACHE.put(uuid, username);
+
+				return username;
 			}
 		}
 		
@@ -108,8 +132,17 @@ public final class ActorRegistry {
 			return null;
 		}
 
+		// Return cached result, if any
+		if (UUID_USERNAME_CACHE.containsValue(username)) {
+			for (Map.Entry<UUID, String> e : UUID_USERNAME_CACHE.entrySet()) {
+				if (username.equalsIgnoreCase(e.getValue())) {
+					return e.getKey();
+				}
+			}
+		}
+
 		String url = String.format(UUID_REQUEST_URL, username);
-		String text = getResponseString(url);
+		String text = getResponseFromUrl(url);
 		
 		if (text != null)
 		{
@@ -117,13 +150,34 @@ public final class ActorRegistry {
 			
 			NameResponse response = gson.fromJson(text, NameResponse.class);
 			
-			return UUID.fromString(hyphenateUUIDString(response.id));
+			UUID uuid = UUID.fromString(hyphenateUUIDString(response.id));
+
+			UUID_USERNAME_CACHE.put(uuid, username);
+
+			return uuid;
 		}
 		
 		return null;
 	}
 	
-	private static String getResponseString(String url) {
+	private static String getResponseFromUrl(String url) {
+		Bukkit.getLogger().info(String.format("Performing HTTP GET on '%s'", url));
+
+		if (System.currentTimeMillis() >= requestResetTime) {
+			requestResetTime = System.currentTimeMillis() + REQUEST_COUNT_RESET_INTERVAL_MS;
+
+			requestCount = 0;
+		}
+
+		if (requestCount > REQUEST_LIMIT) {
+			Bukkit.getLogger().warning("Sending too many requests! Rate limiting!");
+
+			return null;
+		}
+		else {
+			++requestCount;
+		}
+
 		try {
 			URLConnection c = new URL(url).openConnection();
 			

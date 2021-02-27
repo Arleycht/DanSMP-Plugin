@@ -3,14 +3,11 @@ package io.github.arleycht.SMP.Characters;
 import java.util.UUID;
 
 public class Actor {
-	private static final String uuidRequestURL = "https://api.mojang.com/users/profiles/minecraft/%s";
-	private static final String nameRequestURL = "https://api.mojang.com/user/profiles/%s/names";
-
 	public static final String NO_NAME = "<NO_NAME>";
 	public static final String NO_USERNAME = "<NO_USER>";
 	
-	private String realName;
-	private String username;
+	protected String realName;
+	protected String username;
 	
 	public Actor() {
 		realName = NO_NAME;

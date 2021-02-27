@@ -13,10 +13,16 @@ public class DanSMP extends JavaPlugin {
     @Override
     public void onEnable() {
         initializeAll();
+
+        AbilityRegistry.scheduleAllAbilityTasks();
+
+        getLogger().info("DanSMP enabled!");
     }
 
     @Override
     public void onDisable() {
+        AbilityRegistry.cancelAllAbilityTasks();
+
         getLogger().info("DanSMP disabled!");
     }
 
@@ -39,6 +45,8 @@ public class DanSMP extends JavaPlugin {
     }
 
     private void initializeCharacters() {
+        ActorRegistry.setPlugin(this);
+
         // TODO: Have these stored in a JSON file or something, yikes
         ActorRegistry.addActor("Angela", "AkinaS0");
         ActorRegistry.addActor("Max", "ALCleveland");
@@ -75,6 +83,8 @@ public class DanSMP extends JavaPlugin {
     }
 
     private void initializeAbilities() {
+        AbilityRegistry.setPlugin(this);
+
         // TODO: Have these stored in JSON files too, my goodness
         AbilityRegistry.registerAbility("Arleycht", CreepyManAbility.class, this);
     }

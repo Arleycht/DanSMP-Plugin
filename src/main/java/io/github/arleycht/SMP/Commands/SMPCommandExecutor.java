@@ -29,13 +29,11 @@ public class SMPCommandExecutor implements CommandExecutor {
 
         switch (args[0].toLowerCase()) {
             case "funny":
-                player.damage(1.0);
-                player.setHealth(0.0);
-                player.chat(":^)");
-
                 String msg = "%s used the funny command!\nPlease laugh.";
 
                 Bukkit.broadcastMessage(String.format(msg, player.getName()));
+                player.chat(":^)");
+                player.setHealth(0.0);
 
                 return true;
             default:

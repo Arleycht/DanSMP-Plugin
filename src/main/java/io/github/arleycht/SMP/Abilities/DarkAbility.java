@@ -80,7 +80,7 @@ public class DarkAbility extends Ability {
 
     @Override
     public String getName() {
-        return "« Dark Embrace »";
+        return "Dark Embrace";
     }
 
     @Override

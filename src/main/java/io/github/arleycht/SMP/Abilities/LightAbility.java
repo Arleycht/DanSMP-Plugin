@@ -80,7 +80,7 @@ public class LightAbility extends Ability {
 
     @Override
     public String getName() {
-        return "« Beckoner of Light »";
+        return "Beckoner of Light";
     }
 
     @Override

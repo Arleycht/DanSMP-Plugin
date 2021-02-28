@@ -8,7 +8,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
-public class SinglePlayerExplorerAbility extends Ability {
+public class HermeticWandererAbility extends Ability {
     protected boolean gliding = false;
 
     @EventHandler
@@ -30,5 +30,15 @@ public class SinglePlayerExplorerAbility extends Ability {
         if (event.isGliding() != gliding) {
             event.setCancelled(true);
         }
+    }
+
+    @Override
+    public String getName() {
+        return "Sky is the Limit";
+    }
+
+    @Override
+    public String getDescription() {
+        return "A nomadic lifestyle of reduced health from the wears of travel.";
     }
 }

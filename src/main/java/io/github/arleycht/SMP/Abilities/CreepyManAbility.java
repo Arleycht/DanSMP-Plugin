@@ -173,7 +173,7 @@ public class CreepyManAbility extends Ability {
 
     @Override
     public String getName() {
-        return "« Explosive Origins »";
+        return "Explosive Origins";
     }
 
     @Override

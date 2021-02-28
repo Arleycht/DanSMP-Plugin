@@ -20,7 +20,7 @@ public class FortressAbility extends Ability {
 
     @Override
     public String getName() {
-        return "« Walking Fortress »";
+        return "Walking Fortress";
     }
 
     @Override

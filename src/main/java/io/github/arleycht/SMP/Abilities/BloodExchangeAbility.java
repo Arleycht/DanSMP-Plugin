@@ -68,7 +68,7 @@ public class BloodExchangeAbility extends Ability {
 
     @Override
     public String getName() {
-        return "« Blood for Blood »";
+        return "Blood for Blood";
     }
 
     @Override

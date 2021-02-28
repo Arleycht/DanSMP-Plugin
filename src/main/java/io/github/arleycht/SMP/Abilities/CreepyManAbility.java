@@ -7,15 +7,15 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityTargetEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 public class CreepyManAbility extends Ability {
@@ -24,10 +24,54 @@ public class CreepyManAbility extends Ability {
     // several minutes longer for these absolutely insane rates
     public static final long GENERATION_INTERVAL_MS = 1000L * 60L * 20L;
     // Check every 60 seconds
-    protected static final long CHECK_INTERVAL_TICKS = 20L * 60L;
+    public static final long CHECK_INTERVAL_TICKS = 20L * 60L;
+
+    // Your ability: self-destruction
+    public static final Material ABILITY_ITEM = Material.GUNPOWDER;
+    public static final long ABILITY_DELAY_TICKS = 10L;
+    public static final String ABILITY_DEATH_MESSAGE = "%s blew up canonically";
 
     protected long lastGenerationTime;
     protected PacketAdapter packetAdapter;
+
+    protected boolean isSelfInflicted = false;
+
+    @EventHandler
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+        EquipmentSlot hand = event.getHand();
+        ItemStack heldItemStack = player.getInventory().getItem(hand);
+        Material heldItemType = heldItemStack.getType();
+
+        if (hand != EquipmentSlot.HAND || heldItemType != ABILITY_ITEM) {
+            return;
+        }
+
+        heldItemStack.setAmount(heldItemStack.getAmount() - 1);
+
+        isSelfInflicted = true;
+
+        World world = player.getWorld();
+
+        world.playSound(player.getLocation(),  Sound.ENTITY_CREEPER_PRIMED, 1.0f, 2.0f);
+
+        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                world.createExplosion(player.getLocation(), 6.0f, false, true, player);
+                player.setHealth(0.0);
+            }
+        }, ABILITY_DELAY_TICKS);
+    }
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        if (isSelfInflicted && isOwner(event.getEntity().getUniqueId())) {
+            isSelfInflicted = false;
+
+            event.setDeathMessage(String.format(ABILITY_DEATH_MESSAGE, owner.getUsername()));
+        }
+    }
 
     @Override
     public void initialize() {

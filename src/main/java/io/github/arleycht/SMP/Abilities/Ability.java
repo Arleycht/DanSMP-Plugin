@@ -1,16 +1,14 @@
 package io.github.arleycht.SMP.Abilities;
 
 import io.github.arleycht.SMP.Characters.Actor;
-import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.Entity;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.UUID;
 
 public abstract class Ability implements Listener, Runnable {
     public static final String NO_NAME = "Blank Ability";
@@ -42,19 +40,8 @@ public abstract class Ability implements Listener, Runnable {
 
     }
 
-    public boolean isOwner(UUID uuid) {
-        if (owner == null) {
-            return false;
-        }
-
-        Player player = Bukkit.getPlayer(uuid);
-
-        if (player != null && player.getName().equalsIgnoreCase(owner.getUsername())) {
-            return true;
-        }
-
-        // Fallback
-        return owner.getUniqueId().equals(uuid);
+    public boolean isOwner(Entity entity) {
+        return owner.getUsername().equalsIgnoreCase(entity.getName()) || owner.getUniqueId().equals(entity.getUniqueId());
     }
 
     public String getName() {

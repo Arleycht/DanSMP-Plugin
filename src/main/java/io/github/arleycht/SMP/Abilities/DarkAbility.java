@@ -71,9 +71,9 @@ public class DarkAbility extends Ability {
             return;
         }
 
-        if (active && isOwner(attacker.getUniqueId())) {
+        if (active && isOwner(attacker)) {
             event.setDamage(event.getFinalDamage() * 2.0);
-        } else if (!active && isOwner(victim.getUniqueId())) {
+        } else if (!active && isOwner(victim)) {
             event.setDamage(event.getFinalDamage() * 2.0);
         }
     }

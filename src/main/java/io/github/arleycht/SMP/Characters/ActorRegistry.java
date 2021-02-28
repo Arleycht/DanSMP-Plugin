@@ -2,6 +2,7 @@ package io.github.arleycht.SMP.Characters;
 
 import com.google.gson.Gson;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.io.InputStream;
@@ -106,6 +107,15 @@ public final class ActorRegistry {
 			return UUID_USERNAME_CACHE.get(uuid);
 		}
 
+		// Try Bukkit
+		Player player = Bukkit.getPlayer(uuid);
+
+		if (player != null) {
+			UUID_USERNAME_CACHE.put(player.getUniqueId(), player.getName());
+
+			return player.getName();
+		}
+
 		String url = String.format(NAME_REQUEST_URL, uuid.toString());
 		String text = getResponseFromUrl(url);
 		
@@ -139,6 +149,15 @@ public final class ActorRegistry {
 					return e.getKey();
 				}
 			}
+		}
+
+		// Try Bukkit
+		Player player = Bukkit.getPlayer(username);
+
+		if (player != null) {
+			UUID_USERNAME_CACHE.put(player.getUniqueId(), player.getName());
+
+			return player.getUniqueId();
 		}
 
 		String url = String.format(UUID_REQUEST_URL, username);

@@ -54,7 +54,7 @@ public class CreepyManAbility extends Ability {
                 String soundName = soundPacket.getSoundEffect().name().toLowerCase();
 
                 // If the sound is going to the owner, we can ignore this packet
-                if (isOwner(receivingPlayer.getUniqueId())) {
+                if (isOwner(receivingPlayer)) {
                     return;
                 }
 
@@ -80,7 +80,7 @@ public class CreepyManAbility extends Ability {
                     }
                 }
 
-                if (closestPlayer != null && isOwner(closestPlayer.getUniqueId())) {
+                if (closestPlayer != null && isOwner(closestPlayer)) {
                     event.setCancelled(true);
                 }
             }
@@ -133,7 +133,7 @@ public class CreepyManAbility extends Ability {
         }
 
         // Make creepers ignore the ability owner
-        if (isOwner(target.getUniqueId()) && entity instanceof Creeper) {
+        if (isOwner(target) && entity instanceof Creeper) {
             event.setCancelled(true);
         }
     }
@@ -168,7 +168,7 @@ public class CreepyManAbility extends Ability {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-        if (isSelfInflicted && isOwner(event.getEntity().getUniqueId())) {
+        if (isSelfInflicted && isOwner(event.getEntity())) {
             isSelfInflicted = false;
 
             event.setDeathMessage(String.format(ABILITY_DEATH_MESSAGE, owner.getUsername()));

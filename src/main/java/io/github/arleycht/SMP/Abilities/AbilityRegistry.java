@@ -61,7 +61,7 @@ public final class AbilityRegistry {
                     }
 
                     for (Ability ability : ABILITIES) {
-                        if (!ability.isOwner(player.getUniqueId())) {
+                        if (!ability.isOwner(player)) {
                             continue;
                         }
 

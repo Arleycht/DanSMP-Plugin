@@ -59,7 +59,7 @@ public class BloodExchangeAbility extends Ability {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-        if (diedToOveruse && isOwner(event.getEntity().getUniqueId())) {
+        if (diedToOveruse && isOwner(event.getEntity())) {
             diedToOveruse = false;
 
             event.setDeathMessage(String.format(OVERUSE_DEATH_MESSAGE, owner.getUsername()));

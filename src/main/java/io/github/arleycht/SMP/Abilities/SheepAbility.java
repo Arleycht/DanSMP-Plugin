@@ -31,7 +31,7 @@ public class SheepAbility extends Ability {
         Player player = event.getPlayer();
         World world = player.getWorld();
 
-        if (isOwner(player.getUniqueId()) && player.isSneaking()) {
+        if (isOwner(player) && player.isSneaking()) {
             long currentTime = System.currentTimeMillis();
 
             if (eaten) {

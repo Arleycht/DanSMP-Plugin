@@ -149,12 +149,9 @@ public final class AbilityRegistry {
 
         plugin.getServer().getPluginManager().registerEvents(new AbilityAttributeEventListener(), plugin);
 
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-            @Override
-            public void run() {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    plugin.getServer().getPluginManager().callEvent(new AbilityAttributeEvent(player));
-                }
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                plugin.getServer().getPluginManager().callEvent(new AbilityAttributeEvent(player));
             }
         }, 0L, ABILITY_ATTRIBUTE_CHECK_INTERVAL);
     }

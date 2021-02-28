@@ -36,43 +36,6 @@ public class CreepyManAbility extends Ability {
 
     protected boolean isSelfInflicted = false;
 
-    @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent event) {
-        Player player = event.getPlayer();
-        EquipmentSlot hand = event.getHand();
-        ItemStack heldItemStack = player.getInventory().getItem(hand);
-        Material heldItemType = heldItemStack.getType();
-
-        if (hand != EquipmentSlot.HAND || heldItemType != ABILITY_ITEM) {
-            return;
-        }
-
-        heldItemStack.setAmount(heldItemStack.getAmount() - 1);
-
-        isSelfInflicted = true;
-
-        World world = player.getWorld();
-
-        world.playSound(player.getLocation(),  Sound.ENTITY_CREEPER_PRIMED, 1.0f, 2.0f);
-
-        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-            @Override
-            public void run() {
-                world.createExplosion(player.getLocation(), 6.0f, false, true, player);
-                player.setHealth(0.0);
-            }
-        }, ABILITY_DELAY_TICKS);
-    }
-
-    @EventHandler
-    public void onPlayerDeath(PlayerDeathEvent event) {
-        if (isSelfInflicted && isOwner(event.getEntity().getUniqueId())) {
-            isSelfInflicted = false;
-
-            event.setDeathMessage(String.format(ABILITY_DEATH_MESSAGE, owner.getUsername()));
-        }
-    }
-
     @Override
     public void initialize() {
         lastGenerationTime = System.currentTimeMillis();
@@ -165,9 +128,50 @@ public class CreepyManAbility extends Ability {
         Entity entity = event.getEntity();
         Entity target = event.getTarget();
 
+        if (entity == null || target == null) {
+            return;
+        }
+
         // Make creepers ignore the ability owner
         if (isOwner(target.getUniqueId()) && entity instanceof Creeper) {
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+        EquipmentSlot hand = event.getHand();
+        ItemStack heldItemStack = player.getInventory().getItem(hand);
+        Material heldItemType = heldItemStack.getType();
+
+        if (hand != EquipmentSlot.HAND || heldItemType != ABILITY_ITEM) {
+            return;
+        }
+
+        heldItemStack.setAmount(heldItemStack.getAmount() - 1);
+
+        isSelfInflicted = true;
+
+        World world = player.getWorld();
+
+        world.playSound(player.getLocation(),  Sound.ENTITY_CREEPER_PRIMED, 1.0f, 2.0f);
+
+        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                world.createExplosion(player.getLocation(), 6.0f, false, true, player);
+                player.setHealth(0.0);
+            }
+        }, ABILITY_DELAY_TICKS);
+    }
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        if (isSelfInflicted && isOwner(event.getEntity().getUniqueId())) {
+            isSelfInflicted = false;
+
+            event.setDeathMessage(String.format(ABILITY_DEATH_MESSAGE, owner.getUsername()));
         }
     }
 

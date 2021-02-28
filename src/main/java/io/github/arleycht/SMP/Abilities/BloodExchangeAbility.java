@@ -65,4 +65,14 @@ public class BloodExchangeAbility extends Ability {
             event.setDeathMessage(String.format(OVERUSE_DEATH_MESSAGE, owner.getUsername()));
         }
     }
+
+    @Override
+    public String getName() {
+        return "« Blood for Blood »";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Heals others with your own health!";
+    }
 }

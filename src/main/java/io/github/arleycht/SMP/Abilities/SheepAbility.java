@@ -83,4 +83,14 @@ public class SheepAbility extends Ability {
                 return null;
         }
     }
+
+    @Override
+    public String getName() {
+        return "Fluff";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Eat grass and generate wool.";
+    }
 }

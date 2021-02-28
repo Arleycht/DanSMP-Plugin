@@ -49,7 +49,7 @@ public abstract class Ability implements Listener, Runnable {
 
         Player player = Bukkit.getPlayer(uuid);
 
-        if (player.getName().equalsIgnoreCase(owner.getUsername())) {
+        if (player != null && player.getName().equalsIgnoreCase(owner.getUsername())) {
             return true;
         }
 

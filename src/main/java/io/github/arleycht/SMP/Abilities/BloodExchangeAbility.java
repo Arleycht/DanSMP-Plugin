@@ -17,7 +17,7 @@ public class BloodExchangeAbility extends Ability {
 
     public static final String OVERUSE_DEATH_MESSAGE = "%s died to charitable causes";
 
-    protected boolean diedToOveruse = false;
+    private boolean diedToOveruse = false;
 
     @EventHandler
     public void onItemUse(PlayerInteractEntityEvent event) {

@@ -1,44 +1,75 @@
 package io.github.arleycht.SMP.Abilities;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.EntityToggleGlideEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 public class SkyWandererAbility extends Ability {
-    protected boolean gliding = false;
+    public static final long TASK_INTERVAL_TICKS = 5L;
 
-    @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent event) {
-        Player player = event.getPlayer();
-        EquipmentSlot hand = event.getHand();
-        ItemStack heldItemStack = player.getInventory().getItem(hand);
-        Material heldItemType = heldItemStack.getType();
+    private ItemStack originalItem;
+    private int originalElytraSlot;
 
-        gliding = !gliding;
+    private boolean wasOnGround = false;
 
-        if (hand == EquipmentSlot.HAND && heldItemType == Material.STICK) {
-            player.setGliding(gliding);
-        }
+    @Override
+    public boolean isRunnable() {
+        return true;
     }
 
-    @EventHandler
-    public void onGlide(EntityToggleGlideEvent event) {
-        if (event.isGliding() != gliding) {
-            event.setCancelled(true);
+    @Override
+    public long getTaskIntervalTicks() {
+        return TASK_INTERVAL_TICKS;
+    }
+
+    @Override
+    public void run() {
+        Player player = Bukkit.getPlayer(owner.getUniqueId());
+
+        if (player != null) {
+            boolean isOnGround = player.isOnGround();
+
+            if (wasOnGround != isOnGround) {
+                wasOnGround = isOnGround;
+
+                if (isOnGround) {
+                    unequipElytra(player);
+                } else {
+                    equipElytra(player);
+                }
+            }
         }
     }
 
     @Override
     public String getName() {
-        return "Sky is the Limit";
+        return "Sky's the Limit";
     }
 
     @Override
     public String getDescription() {
         return "A nomadic lifestyle of reduced health from the wears of travel.";
+    }
+
+    private int getElytraSlot(Inventory inventory) {
+        for (int i = 0; i < inventory.getSize(); ++i) {
+            ItemStack item = inventory.getItem(i);
+
+            if (item != null && item.getType() == Material.ELYTRA) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    private void equipElytra(Player player) {
+
+    }
+
+    private void unequipElytra(Player player) {
+
     }
 }

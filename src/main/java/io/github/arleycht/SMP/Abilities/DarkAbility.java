@@ -21,7 +21,7 @@ public class DarkAbility extends Ability {
     public static final String ACTIVE_MESSAGE = "You feel the moon begin to rise";
     public static final String INACTIVE_MESSAGE = "You feel the moon begin to set";
 
-    protected boolean active = false;
+    private boolean active = false;
 
     @Override
     public boolean isRunnable() {

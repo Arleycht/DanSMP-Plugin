@@ -31,10 +31,10 @@ public class CreepyManAbility extends Ability {
     public static final long ABILITY_DELAY_TICKS = 10L;
     public static final String ABILITY_DEATH_MESSAGE = "%s blew up canonically";
 
-    protected long lastGenerationTime;
-    protected PacketAdapter packetAdapter;
+    private long lastGenerationTime;
+    private PacketAdapter packetAdapter;
 
-    protected boolean isSelfInflicted = false;
+    private boolean isSelfInflicted = false;
 
     @Override
     public void initialize() {

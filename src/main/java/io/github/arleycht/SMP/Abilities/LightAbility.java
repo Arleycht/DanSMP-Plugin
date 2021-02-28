@@ -21,7 +21,7 @@ public class LightAbility extends Ability {
     public static final String ACTIVE_MESSAGE = "You feel the sun begin to rise";
     public static final String INACTIVE_MESSAGE = "You feel the sun begin to set";
 
-    protected boolean active = false;
+    private boolean active = false;
 
     @Override
     public boolean isRunnable() {

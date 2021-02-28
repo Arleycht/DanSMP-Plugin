@@ -1,8 +1,10 @@
 package io.github.arleycht.SMP.Abilities;
 
 import io.github.arleycht.SMP.Characters.Actor;
+import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
@@ -45,6 +47,13 @@ public abstract class Ability implements Listener, Runnable {
             return false;
         }
 
+        Player player = Bukkit.getPlayer(uuid);
+
+        if (player.getName().equalsIgnoreCase(owner.getUsername())) {
+            return true;
+        }
+
+        // Fallback
         return owner.getUniqueId().equals(uuid);
     }
 

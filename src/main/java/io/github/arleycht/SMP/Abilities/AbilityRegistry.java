@@ -32,21 +32,21 @@ public final class AbilityRegistry {
     public static final class AbilityAttributeEventListener implements Listener {
         @EventHandler
         public void onPlayerJoin(PlayerJoinEvent event) {
-            Bukkit.getLogger().info("Player join event!");
+            //Bukkit.getLogger().info("Player join event!");
 
             applyModifiers(event.getPlayer());
         }
 
         @EventHandler
         public void onRespawn(PlayerRespawnEvent event) {
-            Bukkit.getLogger().info("Player respawn event!");
+            //Bukkit.getLogger().info("Player respawn event!");
 
             applyModifiers(event.getPlayer());
         }
 
         @EventHandler
         public void onAbilityAttributeEvent(AbilityAttributeEvent event) {
-            Bukkit.getLogger().info("Attribute event!");
+            //Bukkit.getLogger().info("Attribute event!");
 
             applyModifiers(event.getPlayer());
         }

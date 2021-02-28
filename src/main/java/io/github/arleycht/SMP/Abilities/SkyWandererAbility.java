@@ -8,7 +8,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
-public class HermeticWandererAbility extends Ability {
+public class SkyWandererAbility extends Ability {
     protected boolean gliding = false;
 
     @EventHandler

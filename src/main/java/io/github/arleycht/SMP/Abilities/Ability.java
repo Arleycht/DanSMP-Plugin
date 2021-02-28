@@ -1,10 +1,13 @@
 package io.github.arleycht.SMP.Abilities;
 
 import io.github.arleycht.SMP.Characters.Actor;
-import org.bukkit.entity.Player;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.UUID;
 
 public abstract class Ability implements Listener, Runnable {
@@ -14,8 +17,10 @@ public abstract class Ability implements Listener, Runnable {
     protected Plugin plugin;
     protected Actor owner;
 
-    public Ability() {
+    protected HashMap<Attribute, ArrayList<AttributeModifier>> attributeModifiers;
 
+    public Ability() {
+        attributeModifiers = new HashMap<>();
     }
 
     public void initialize() {
@@ -35,10 +40,6 @@ public abstract class Ability implements Listener, Runnable {
 
     }
 
-    public void applyAttributeModifiers(Player player) {
-
-    }
-
     public boolean isOwner(UUID uuid) {
         if (owner == null) {
             return false;
@@ -55,12 +56,37 @@ public abstract class Ability implements Listener, Runnable {
         return NO_DESCRIPTION;
     }
 
+    public AttributeModifier[] getAttributeModifiers(Attribute attribute) {
+        if (attributeModifiers.containsKey(attribute)) {
+            ArrayList<AttributeModifier> modifiers = attributeModifiers.get(attribute);
+            AttributeModifier[] modifierArray = new AttributeModifier[modifiers.size()];
+
+            return modifiers.toArray(modifierArray);
+        }
+
+        return new AttributeModifier[0];
+    }
+
     public Plugin getPlugin() {
         return plugin;
     }
 
     public Actor getOwner() {
         return owner;
+    }
+
+    public void addAttributeModifier(Attribute attribute, double amount, AttributeModifier.Operation operation) {
+        AttributeModifier modifier = new AttributeModifier(getName(), amount, operation);
+
+        if (!attributeModifiers.containsKey(attribute)) {
+            attributeModifiers.put(attribute, new ArrayList<>());
+        }
+
+        attributeModifiers.get(attribute).add(modifier);
+    }
+
+    public void clearAttributeModifiers() {
+        attributeModifiers.clear();
     }
 
     public void setPlugin(Plugin plugin) {

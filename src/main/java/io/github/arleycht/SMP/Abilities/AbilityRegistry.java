@@ -3,7 +3,6 @@ package io.github.arleycht.SMP.Abilities;
 import io.github.arleycht.SMP.Characters.Actor;
 import io.github.arleycht.SMP.Characters.ActorRegistry;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
@@ -20,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class AbilityRegistry {
+    private static final long ABILITY_ATTRIBUTE_CHECK_INTERVAL = 20L;
     private static final ArrayList<Ability> ABILITIES = new ArrayList<>();
     private static final HashMap<Ability, BukkitTask> ABILITY_BUKKIT_TASK_MAP = new HashMap<>();
 
@@ -29,31 +29,29 @@ public final class AbilityRegistry {
 
     }
 
-    public static final class AbilityAttributeListener implements Listener {
+    public static final class AbilityAttributeEventListener implements Listener {
         @EventHandler
         public void onPlayerJoin(PlayerJoinEvent event) {
-            Bukkit.getLogger().info("Player join!");
+            Bukkit.getLogger().info("Player join event!");
 
             applyModifiers(event.getPlayer());
         }
 
         @EventHandler
         public void onRespawn(PlayerRespawnEvent event) {
-            Bukkit.getLogger().info("Respawn!");
+            Bukkit.getLogger().info("Player respawn event!");
 
             applyModifiers(event.getPlayer());
         }
 
-        protected void applyModifiers(Player player) {
-            if (player == null) {
-                return;
-            }
+        @EventHandler
+        public void onAbilityAttributeEvent(AbilityAttributeEvent event) {
+            Bukkit.getLogger().info("Attribute event!");
 
-            World world = player.getWorld();
+            applyModifiers(event.getPlayer());
+        }
 
-            String msg = "'%s' spawned in '%s'";
-            Bukkit.getLogger().info(String.format(msg, player.getName(), world.getName()));
-
+        private void applyModifiers(Player player) {
             for (Attribute attribute : Attribute.values()) {
                 AttributeInstance attributeInstance = player.getAttribute(attribute);
 
@@ -61,12 +59,18 @@ public final class AbilityRegistry {
                     for (AttributeModifier modifier : attributeInstance.getModifiers()) {
                         attributeInstance.removeModifier(modifier);
                     }
-                }
-            }
 
-            for (Ability ability : ABILITIES) {
-                if (ability.isOwner(player.getUniqueId())) {
-                    ability.applyAttributeModifiers(player);
+                    for (Ability ability : ABILITIES) {
+                        if (!ability.isOwner(player.getUniqueId())) {
+                            continue;
+                        }
+
+                        AttributeModifier[] modifiers = ability.getAttributeModifiers(attribute);
+
+                        for (AttributeModifier modifier : modifiers) {
+                            attributeInstance.addModifier(modifier);
+                        }
+                    }
                 }
             }
         }
@@ -143,7 +147,16 @@ public final class AbilityRegistry {
 
         AbilityRegistry.plugin = plugin;
 
-        plugin.getServer().getPluginManager().registerEvents(new AbilityAttributeListener(), plugin);
+        plugin.getServer().getPluginManager().registerEvents(new AbilityAttributeEventListener(), plugin);
+
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+            @Override
+            public void run() {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    plugin.getServer().getPluginManager().callEvent(new AbilityAttributeEvent(player));
+                }
+            }
+        }, 0L, ABILITY_ATTRIBUTE_CHECK_INTERVAL);
     }
 
     public static BukkitTask scheduleAbilityTask(Ability ability) {

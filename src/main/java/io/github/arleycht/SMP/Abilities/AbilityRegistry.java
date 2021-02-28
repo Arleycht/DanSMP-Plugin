@@ -42,12 +42,14 @@ public final class AbilityRegistry {
 
         try {
             ability = t.newInstance();
+            ability.setPlugin(plugin);
             ability.setOwner(actor);
 
             Bukkit.getServer().getPluginManager().registerEvents(ability, plugin);
-            //scheduleAbilityTask(ability);
 
             ABILITIES.add(ability);
+
+            ability.initialize();
 
             String msg = "Registered ability '%s' to '%s'";
             Bukkit.getLogger().info(String.format(msg, ability.getName(), username));

@@ -1,7 +1,6 @@
 package io.github.arleycht.SMP.Abilities;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -19,7 +18,8 @@ public class CreepyManAbility extends Ability {
 
     protected long lastGenerationTime;
 
-    public CreepyManAbility() {
+    @Override
+    public void initialize() {
         lastGenerationTime = System.currentTimeMillis();
     }
 

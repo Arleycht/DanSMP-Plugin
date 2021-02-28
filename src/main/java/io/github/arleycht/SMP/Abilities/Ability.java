@@ -17,6 +17,10 @@ public abstract class Ability implements Listener, Runnable {
 
     }
 
+    public void initialize() {
+
+    }
+
     public boolean isRunnable() {
         return false;
     }
@@ -46,8 +50,16 @@ public abstract class Ability implements Listener, Runnable {
         return NO_DESCRIPTION;
     }
 
+    public Plugin getPlugin() {
+        return plugin;
+    }
+
     public Actor getOwner() {
         return owner;
+    }
+
+    public void setPlugin(Plugin plugin) {
+        this.plugin = plugin;
     }
 
     public void setOwner(Actor owner) {

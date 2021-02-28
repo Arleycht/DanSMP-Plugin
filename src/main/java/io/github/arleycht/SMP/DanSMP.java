@@ -1,6 +1,7 @@
 package io.github.arleycht.SMP;
 
 import io.github.arleycht.SMP.Abilities.AbilityRegistry;
+import io.github.arleycht.SMP.Abilities.BloodExchangeAbility;
 import io.github.arleycht.SMP.Abilities.CreepyManAbility;
 import io.github.arleycht.SMP.Characters.ActorRegistry;
 import io.github.arleycht.SMP.Commands.SMPCommandExecutor;
@@ -87,6 +88,7 @@ public class DanSMP extends JavaPlugin {
 
         // TODO: Have these stored in JSON files too, my goodness
         AbilityRegistry.registerAbility("Arleycht", CreepyManAbility.class, this);
+        AbilityRegistry.registerAbility("Arleycht", BloodExchangeAbility.class, this);
     }
 
     private void registerCommand(String command, CommandExecutor executor) {

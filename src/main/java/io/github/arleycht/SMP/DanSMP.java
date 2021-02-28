@@ -1,9 +1,6 @@
 package io.github.arleycht.SMP;
 
-import io.github.arleycht.SMP.Abilities.AbilityRegistry;
-import io.github.arleycht.SMP.Abilities.BloodExchangeAbility;
-import io.github.arleycht.SMP.Abilities.CreepyManAbility;
-import io.github.arleycht.SMP.Abilities.FortressAbility;
+import io.github.arleycht.SMP.Abilities.*;
 import io.github.arleycht.SMP.Characters.ActorRegistry;
 import io.github.arleycht.SMP.Commands.SMPCommandExecutor;
 import org.bukkit.command.CommandExecutor;
@@ -88,9 +85,9 @@ public class DanSMP extends JavaPlugin {
         AbilityRegistry.setPlugin(this);
 
         // TODO: Have these stored in JSON files too, my goodness
-        AbilityRegistry.registerAbility("Arleycht", CreepyManAbility.class, this);
-        AbilityRegistry.registerAbility("Arleycht", BloodExchangeAbility.class, this);
-        AbilityRegistry.registerAbility("Arleycht", FortressAbility.class, this);
+        AbilityRegistry.registerAbility("BleuInfern", CreepyManAbility.class, this);
+        AbilityRegistry.registerAbility("Captain_Cheeks", BloodExchangeAbility.class, this);
+        AbilityRegistry.registerAbility("Kaos_Greed", FortressAbility.class, this);
     }
 
     private void registerCommand(String command, CommandExecutor executor) {

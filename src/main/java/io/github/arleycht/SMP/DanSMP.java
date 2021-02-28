@@ -88,6 +88,8 @@ public class DanSMP extends JavaPlugin {
         AbilityRegistry.registerAbility("BleuInfern", CreepyManAbility.class, this);
         AbilityRegistry.registerAbility("Captain_Cheeks", BloodExchangeAbility.class, this);
         AbilityRegistry.registerAbility("Kaos_Greed", FortressAbility.class, this);
+        AbilityRegistry.registerAbility("L1ghtEater", DarkAbility.class, this);
+        AbilityRegistry.registerAbility("Kaos_Pride", LightAbility.class, this);
     }
 
     private void registerCommand(String command, CommandExecutor executor) {

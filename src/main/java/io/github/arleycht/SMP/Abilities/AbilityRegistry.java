@@ -3,6 +3,15 @@ package io.github.arleycht.SMP.Abilities;
 import io.github.arleycht.SMP.Characters.Actor;
 import io.github.arleycht.SMP.Characters.ActorRegistry;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -18,6 +27,49 @@ public final class AbilityRegistry {
 
     private AbilityRegistry() {
 
+    }
+
+    public static final class AbilityAttributeListener implements Listener {
+        @EventHandler
+        public void onPlayerJoin(PlayerJoinEvent event) {
+            Bukkit.getLogger().info("Player join!");
+
+            applyModifiers(event.getPlayer());
+        }
+
+        @EventHandler
+        public void onRespawn(PlayerRespawnEvent event) {
+            Bukkit.getLogger().info("Respawn!");
+
+            applyModifiers(event.getPlayer());
+        }
+
+        protected void applyModifiers(Player player) {
+            if (player == null) {
+                return;
+            }
+
+            World world = player.getWorld();
+
+            String msg = "'%s' spawned in '%s'";
+            Bukkit.getLogger().info(String.format(msg, player.getName(), world.getName()));
+
+            for (Attribute attribute : Attribute.values()) {
+                AttributeInstance attributeInstance = player.getAttribute(attribute);
+
+                if (attributeInstance != null) {
+                    for (AttributeModifier modifier : attributeInstance.getModifiers()) {
+                        attributeInstance.removeModifier(modifier);
+                    }
+                }
+            }
+
+            for (Ability ability : ABILITIES) {
+                if (ability.isOwner(player.getUniqueId())) {
+                    ability.applyAttributeModifiers(player);
+                }
+            }
+        }
     }
 
     public static <T extends Ability> Ability registerAbility(String username, Class<T> t, Plugin plugin) {
@@ -90,6 +142,8 @@ public final class AbilityRegistry {
         }
 
         AbilityRegistry.plugin = plugin;
+
+        plugin.getServer().getPluginManager().registerEvents(new AbilityAttributeListener(), plugin);
     }
 
     public static BukkitTask scheduleAbilityTask(Ability ability) {

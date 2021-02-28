@@ -1,6 +1,7 @@
 package io.github.arleycht.SMP.Abilities;
 
 import io.github.arleycht.SMP.Characters.Actor;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
@@ -31,6 +32,10 @@ public abstract class Ability implements Listener, Runnable {
 
     @Override
     public void run() {
+
+    }
+
+    public void applyAttributeModifiers(Player player) {
 
     }
 

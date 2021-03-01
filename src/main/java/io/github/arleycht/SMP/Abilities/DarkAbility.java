@@ -7,6 +7,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
@@ -16,6 +17,8 @@ public class DarkAbility extends Ability {
     public static final long BEGIN_TIME = 10800L;
     public static final long END_TIME = 1200L;
     public static final long ACTIVE_INTERVAL_TIME = Math.abs(END_TIME - BEGIN_TIME);
+
+    public static final double DAMAGE_MULTIPLIER = 2.0;
 
     public static final String ACTIVE_MESSAGE = "You feel the moon begin to rise";
     public static final String INACTIVE_MESSAGE = "You feel the moon begin to set";
@@ -66,14 +69,17 @@ public class DarkAbility extends Ability {
         Entity attacker = event.getDamager();
         Entity victim = event.getEntity();
 
-        if (!(attacker instanceof Player) || !(victim instanceof Player)) {
-            return;
+        if (attacker instanceof Projectile) {
+            // Get entity that shot the projectile
+            attacker = (Entity) ((Projectile) attacker).getShooter();
         }
 
-        if (active && isOwner(attacker)) {
-            event.setDamage(event.getFinalDamage() * 2.0);
-        } else if (!active && isOwner(victim)) {
-            event.setDamage(event.getFinalDamage() * 2.0);
+        // Apply effect when active and attacker is owner,
+        // or when inactive and victim is owner
+        boolean applyEffect = active ? isOwner(attacker) : isOwner(victim);
+
+        if (applyEffect) {
+            event.setDamage(event.getFinalDamage() * DAMAGE_MULTIPLIER);
         }
     }
 

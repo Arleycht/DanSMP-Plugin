@@ -32,6 +32,10 @@ public class BeeAbility extends Ability {
             Player attacker = (Player) damager;
             Player victim = (Player) entity;
 
+            if (System.currentTimeMillis() - lastBeeActivationTime < BEE_COOLDOWN_MS) {
+                return;
+            }
+
             lastBeeActivationTime = System.currentTimeMillis();
 
             World world = victim.getWorld();

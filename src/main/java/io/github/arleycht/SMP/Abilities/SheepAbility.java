@@ -79,7 +79,7 @@ public class SheepAbility extends Ability {
         if (block == null) {
             return null;
         }
-        
+
         switch (block.getType()) {
             case GRASS_BLOCK:
                 return Material.DIRT;

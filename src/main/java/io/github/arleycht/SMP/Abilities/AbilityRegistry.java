@@ -155,7 +155,7 @@ public final class AbilityRegistry {
 
         plugin.getServer().getPluginManager().registerEvents(new AbilityAttributeEventListener(), plugin);
 
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
+        Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 plugin.getServer().getPluginManager().callEvent(new AbilityAttributeEvent(player));
             }

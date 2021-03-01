@@ -157,7 +157,7 @@ public class CreepyManAbility extends Ability {
 
         world.playSound(player.getLocation(),  Sound.ENTITY_CREEPER_PRIMED, 1.0f, 2.0f);
 
-        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+        Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
             @Override
             public void run() {
                 world.createExplosion(player.getLocation(), 6.0f, false, true, player);

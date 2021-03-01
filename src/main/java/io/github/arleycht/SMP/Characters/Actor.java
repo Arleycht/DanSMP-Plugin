@@ -1,5 +1,8 @@
 package io.github.arleycht.SMP.Characters;
 
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
 import java.util.UUID;
 
 public class Actor {
@@ -17,6 +20,12 @@ public class Actor {
 	public Actor(String realName, String username) {
 		this.realName = realName != null ? realName : NO_NAME;
 		this.username = username != null ? username : NO_USERNAME;
+	}
+
+	public Player getPlayer() {
+		Player player = Bukkit.getPlayer(username);
+
+		return player;
 	}
 
 	public UUID getUniqueId() {
@@ -44,7 +53,7 @@ public class Actor {
 			return false;
 		}
 
-		return getUniqueId().equals(other.getUniqueId());
+		return username.equalsIgnoreCase(other.getUsername()) || getUniqueId().equals(other.getUniqueId());
 	}
 
 	public String toString() {

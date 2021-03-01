@@ -2,7 +2,6 @@ package io.github.arleycht.SMP.Abilities;
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -35,7 +34,7 @@ public class DarkAbility extends Ability {
 
     @Override
     public void run() {
-        Player player = Bukkit.getPlayer(owner.getUniqueId());
+        Player player = owner.getPlayer();
 
         if (player == null) {
             return;

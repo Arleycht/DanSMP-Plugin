@@ -106,7 +106,7 @@ public class CreepyManAbility extends Ability {
         }
 
         if (System.currentTimeMillis() - lastGenerationTime > GENERATION_INTERVAL_MS) {
-            Player player = Bukkit.getPlayer(owner.getUniqueId());
+            Player player = owner.getPlayer();
 
             if (player == null) {
                 return;

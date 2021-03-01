@@ -1,6 +1,5 @@
 package io.github.arleycht.SMP.Abilities;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -26,7 +25,7 @@ public class SkyWandererAbility extends Ability {
 
     @Override
     public void run() {
-        Player player = Bukkit.getPlayer(owner.getUniqueId());
+        Player player = owner.getPlayer();
 
         if (player != null) {
             boolean isOnGround = player.isOnGround();

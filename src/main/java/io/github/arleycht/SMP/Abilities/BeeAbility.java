@@ -2,18 +2,22 @@ package io.github.arleycht.SMP.Abilities;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Bee;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.Random;
 
 public class BeeAbility extends Ability {
-    public static final long TASK_UPDATE_INTERVAL = 20L;
+    public static final long TASK_UPDATE_INTERVAL_TICKS = 20L;
 
     public static final int BEE_COUNT_MIN = 12;
     public static final int BEE_COUNT_MAX = 20;
@@ -21,7 +25,43 @@ public class BeeAbility extends Ability {
     public static final int BEE_DURATION_TICKS = 10 * 20;
     public static final long BEE_COOLDOWN_MS = 30L * 1000L;
 
+    public static final long HONEY_BOTTLE_GENERATION_INTERVAL_MS = 10L * 1000L * 60L * 60L;
+
     private long lastBeeActivationTime = 0;
+    private long lastHoneyBottleGenerationTime = 0;
+
+    @Override
+    public void initialize() {
+        lastBeeActivationTime = System.currentTimeMillis();
+    }
+
+    @Override
+    public boolean isRunnable() {
+        return true;
+    }
+
+    @Override
+    public long getTaskIntervalTicks() {
+        return TASK_UPDATE_INTERVAL_TICKS;
+    }
+
+    @Override
+    public void run() {
+        if (System.currentTimeMillis() - lastHoneyBottleGenerationTime < HONEY_BOTTLE_GENERATION_INTERVAL_MS) {
+            return;
+        }
+
+        Player player = owner.getPlayer();
+
+        if (player != null) {
+            lastHoneyBottleGenerationTime = System.currentTimeMillis();
+
+            World world = player.getWorld();
+            ItemStack item = new ItemStack(Material.HONEY_BOTTLE);
+
+            world.dropItem(player.getLocation(), item);
+        }
+    }
 
     @EventHandler
     public void onEntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
@@ -59,11 +99,10 @@ public class BeeAbility extends Ability {
             }
 
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                if (attacker.isDead()) {
-                    for (Bee bee : bees) {
-                        bee.setAnger(0);
-                        bee.setHasStung(true);
-                    }
+                PotionEffect witherEffect = new PotionEffect(PotionEffectType.WITHER, Integer.MAX_VALUE, 1, false, false);
+
+                for (Bee bee : bees) {
+                    bee.addPotionEffect(witherEffect);
                 }
             }, BEE_DURATION_TICKS + BEE_DELAY_MAX);
         }

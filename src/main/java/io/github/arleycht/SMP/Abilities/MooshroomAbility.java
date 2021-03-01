@@ -1,7 +1,9 @@
 package io.github.arleycht.SMP.Abilities;
 
 import io.github.arleycht.SMP.util.Cooldown;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -9,8 +11,8 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class MooshroomAbility extends Ability {
@@ -24,7 +26,7 @@ public class MooshroomAbility extends Ability {
         Player player = event.getPlayer();
 
         if (isOwner(player) && player.isSneaking()) {
-            activateAbility(player);
+            activateAbility(player, player);
         }
     }
 
@@ -34,12 +36,15 @@ public class MooshroomAbility extends Ability {
         Entity targetEntity = event.getRightClicked();
 
         if (isOwner(targetEntity) && targetEntity instanceof Player) {
-            activateAbility(player);
+            activateAbility(player, (Player) targetEntity);
         }
     }
 
-    private void activateAbility(Player player) {
-        ItemStack heldItem = player.getInventory().getItem(EquipmentSlot.HAND);
+    private void activateAbility(Player player, Player target) {
+        PlayerInventory inventory = player.getInventory();
+        ItemStack heldItem = inventory.getItem(EquipmentSlot.HAND);
+
+        Sound interactionSound;
         ItemStack gainedItem;
 
         switch (heldItem.getType()) {
@@ -50,6 +55,7 @@ public class MooshroomAbility extends Ability {
 
                 MILK_COOLDOWN.reset();
 
+                interactionSound = Sound.ENTITY_COW_MILK;
                 gainedItem = new ItemStack(Material.MILK_BUCKET);
 
                 break;
@@ -60,6 +66,7 @@ public class MooshroomAbility extends Ability {
 
                 STEW_COOLDOWN.reset();
 
+                interactionSound = Sound.ENTITY_MOOSHROOM_MILK;
                 gainedItem = new ItemStack(Material.MUSHROOM_STEW);
 
                 break;
@@ -67,12 +74,18 @@ public class MooshroomAbility extends Ability {
                 return;
         }
 
-        heldItem.setAmount(heldItem.getAmount() - 1);
+        int heldAmount = heldItem.getAmount();
 
-        HashMap<Integer, ItemStack> excess = player.getInventory().addItem(gainedItem);
+        if (heldAmount <= 1 || player.getGameMode() == GameMode.CREATIVE) {
+            inventory.setItem(EquipmentSlot.HAND, gainedItem);
+        } else {
+            heldItem.setAmount(heldAmount - 1);
 
-        for (Map.Entry<Integer, ItemStack> entry : excess.entrySet()) {
-            player.getWorld().dropItem(player.getLocation(), entry.getValue());
+            for (Map.Entry<Integer, ItemStack> entry : inventory.addItem(gainedItem).entrySet()) {
+                player.getWorld().dropItem(player.getLocation(), entry.getValue());
+            }
         }
+
+        target.getWorld().playSound(target.getLocation(), interactionSound, 1.0f, 1.0f);
     }
 }

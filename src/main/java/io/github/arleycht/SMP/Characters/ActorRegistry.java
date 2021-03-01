@@ -10,9 +10,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public final class ActorRegistry {
 	private static final int REQUEST_LIMIT = 300;
@@ -21,6 +19,7 @@ public final class ActorRegistry {
 	private static final String NAME_REQUEST_URL = "https://api.mojang.com/user/profiles/%s/names";
 
 	private static final HashMap<UUID, String> UUID_USERNAME_CACHE = new HashMap<>();
+	private static final Vector<String> INVALID_USERNAMES = new Vector<>();
 	private static final ArrayList<Actor> ACTORS = new ArrayList<>();
 
 	private static Plugin plugin = null;
@@ -42,7 +41,7 @@ public final class ActorRegistry {
 	}
 	
 	public static Actor addActor(String realName, String username) {
-		Actor actor = new Actor(realName, username);
+		Actor actor = new Actor(realName, username.toLowerCase());
 
 		Bukkit.getLogger().info(String.format("Adding character '%s'", actor.toString()));
 		
@@ -118,7 +117,7 @@ public final class ActorRegistry {
 		String url = String.format(NAME_REQUEST_URL, uuid.toString());
 		String text = getResponseFromUrl(url);
 		
-		if (text != null)
+		if (text != null && text.length() > 0)
 		{
 			Gson gson = new Gson();
 
@@ -141,6 +140,12 @@ public final class ActorRegistry {
 			return null;
 		}
 
+		for (String name : INVALID_USERNAMES) {
+			if (username.equalsIgnoreCase(name)) {
+				return null;
+			}
+		}
+
 		// Return cached result, if any
 		if (UUID_USERNAME_CACHE.containsValue(username)) {
 			for (Map.Entry<UUID, String> e : UUID_USERNAME_CACHE.entrySet()) {
@@ -154,7 +159,7 @@ public final class ActorRegistry {
 		Player player = Bukkit.getPlayer(username);
 
 		if (player != null) {
-			UUID_USERNAME_CACHE.put(player.getUniqueId(), player.getName());
+			UUID_USERNAME_CACHE.put(player.getUniqueId(), username);
 
 			return player.getUniqueId();
 		}
@@ -162,11 +167,13 @@ public final class ActorRegistry {
 		String url = String.format(UUID_REQUEST_URL, username);
 		String text = getResponseFromUrl(url);
 		
-		if (text != null)
+		if (text != null && text.length() > 0)
 		{
 			Gson gson = new Gson();
 			
 			NameResponse response = gson.fromJson(text, NameResponse.class);
+
+			Bukkit.getLogger().info(String.format("'%s'", String.valueOf(response.id)));
 			
 			UUID uuid = UUID.fromString(hyphenateUUIDString(response.id));
 
@@ -174,6 +181,8 @@ public final class ActorRegistry {
 
 			return uuid;
 		}
+
+		INVALID_USERNAMES.add(username);
 		
 		return null;
 	}
@@ -191,8 +200,7 @@ public final class ActorRegistry {
 			Bukkit.getLogger().warning("Sending too many requests! Rate limiting!");
 
 			return null;
-		}
-		else {
+		} else {
 			++requestCount;
 		}
 

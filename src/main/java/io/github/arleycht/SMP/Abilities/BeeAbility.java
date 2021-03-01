@@ -1,5 +1,6 @@
 package io.github.arleycht.SMP.Abilities;
 
+import io.github.arleycht.SMP.util.Cooldown;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -17,22 +18,19 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class BeeAbility extends Ability {
-    public static final long TASK_UPDATE_INTERVAL_TICKS = 20L;
+    public static final long TASK_INTERVAL_TICKS = 20L;
 
-    public static final int BEE_COUNT_MIN = 12;
-    public static final int BEE_COUNT_MAX = 20;
+    public static final int BEE_COUNT_MIN = 8;
+    public static final int BEE_COUNT_MAX = 12;
     public static final int BEE_DELAY_MAX = 10;
     public static final int BEE_DURATION_TICKS = 10 * 20;
-    public static final long BEE_COOLDOWN_MS = 30L * 1000L;
 
-    public static final long HONEY_BOTTLE_GENERATION_INTERVAL_MS = 10L * 1000L * 60L * 60L;
-
-    private long lastBeeActivationTime = 0;
-    private long lastHoneyBottleGenerationTime = 0;
+    public static final Cooldown BEE_COOLDOWN = new Cooldown(30.0);
+    public static final Cooldown HONEY_BOTTLE_GENERATION_COOLDOWN = new Cooldown(10.0 * 60.0 * 60.0);
 
     @Override
     public void initialize() {
-        lastBeeActivationTime = System.currentTimeMillis();
+        HONEY_BOTTLE_GENERATION_COOLDOWN.reset();
     }
 
     @Override
@@ -42,25 +40,25 @@ public class BeeAbility extends Ability {
 
     @Override
     public long getTaskIntervalTicks() {
-        return TASK_UPDATE_INTERVAL_TICKS;
+        return TASK_INTERVAL_TICKS;
     }
 
     @Override
     public void run() {
-        if (System.currentTimeMillis() - lastHoneyBottleGenerationTime < HONEY_BOTTLE_GENERATION_INTERVAL_MS) {
+        if (HONEY_BOTTLE_GENERATION_COOLDOWN.isNotReady()) {
             return;
         }
 
         Player player = owner.getPlayer();
 
-        if (player != null) {
-            lastHoneyBottleGenerationTime = System.currentTimeMillis();
-
-            World world = player.getWorld();
-            ItemStack item = new ItemStack(Material.HONEY_BOTTLE);
-
-            world.dropItem(player.getLocation(), item);
+        if (player == null) {
+            return;
         }
+
+        ItemStack honeyBottle = new ItemStack(Material.HONEY_BOTTLE);
+        player.getInventory().addItem(honeyBottle);
+
+        HONEY_BOTTLE_GENERATION_COOLDOWN.reset();
     }
 
     @EventHandler
@@ -72,11 +70,11 @@ public class BeeAbility extends Ability {
             Player attacker = (Player) damager;
             Player victim = (Player) entity;
 
-            if (System.currentTimeMillis() - lastBeeActivationTime < BEE_COOLDOWN_MS) {
+            if (BEE_COOLDOWN.isNotReady()) {
                 return;
             }
 
-            lastBeeActivationTime = System.currentTimeMillis();
+            BEE_COOLDOWN.reset();
 
             World world = victim.getWorld();
             Location location = victim.getLocation();

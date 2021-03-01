@@ -9,6 +9,7 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.UUID;
 
 public abstract class Ability implements Listener, Runnable {
     public static final String NO_NAME = "Blank Ability";
@@ -41,7 +42,21 @@ public abstract class Ability implements Listener, Runnable {
     }
 
     public boolean isOwner(Entity entity) {
-        return owner.getUsername().equalsIgnoreCase(entity.getName()) || owner.getUniqueId().equals(entity.getUniqueId());
+        if (owner == null || entity == null) {
+            return false;
+        }
+
+        if (owner.getUsername().equalsIgnoreCase(entity.getName())) {
+            return true;
+        } else {
+            UUID uuid = owner.getUniqueId();
+
+            if (uuid != null) {
+                return uuid.equals(entity.getUniqueId());
+            }
+        }
+
+        return false;
     }
 
     public String getName() {

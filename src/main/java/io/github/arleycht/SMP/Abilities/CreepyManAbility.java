@@ -7,6 +7,7 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
+import io.github.arleycht.SMP.util.Cooldown;
 import org.bukkit.*;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
@@ -19,26 +20,22 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 public class CreepyManAbility extends Ability {
-    // Gunpowder generation interval in milliseconds
-    // This is in realtime because it would be terrible to wait
-    // several minutes longer for these absolutely insane rates
-    public static final long GENERATION_INTERVAL_MS = 1000L * 60L * 20L;
-    // Check every 60 seconds
-    public static final long CHECK_INTERVAL_TICKS = 20L * 60L;
+    public static final long TASK_INTERVAL_TICKS = 60L * 20L;
+
+    public static final Cooldown GENERATION_COOLDOWN = new Cooldown(60 * 20);
 
     // Your ability: self-destruction
     public static final Material ABILITY_ITEM = Material.GUNPOWDER;
     public static final long ABILITY_DELAY_TICKS = 10L;
     public static final String ABILITY_DEATH_MESSAGE = "%s blew up canonically";
 
-    private long lastGenerationTime;
     private PacketAdapter packetAdapter;
 
     private boolean isSelfInflicted = false;
 
     @Override
     public void initialize() {
-        lastGenerationTime = System.currentTimeMillis();
+        GENERATION_COOLDOWN.reset();
 
         if (packetAdapter != null) {
             ProtocolLibrary.getProtocolManager().removePacketListener(packetAdapter);
@@ -96,31 +93,25 @@ public class CreepyManAbility extends Ability {
 
     @Override
     public long getTaskIntervalTicks() {
-        return CHECK_INTERVAL_TICKS;
+        return TASK_INTERVAL_TICKS;
     }
 
     @Override
     public void run() {
-        if (owner == null) {
+        if (GENERATION_COOLDOWN.isNotReady()) {
             return;
         }
 
-        if (System.currentTimeMillis() - lastGenerationTime > GENERATION_INTERVAL_MS) {
-            Player player = owner.getPlayer();
+        Player player = owner.getPlayer();
 
-            if (player == null) {
-                return;
-            }
-
-            ItemStack gunpowder = new ItemStack(Material.GUNPOWDER);
-
-            // ONE SINGULAR GUNPOWDER
-            gunpowder.setAmount(1);
-
-            player.getInventory().addItem(gunpowder);
-
-            lastGenerationTime = System.currentTimeMillis();
+        if (player == null) {
+            return;
         }
+
+        ItemStack gunpowder = new ItemStack(Material.GUNPOWDER);
+        player.getInventory().addItem(gunpowder);
+
+        GENERATION_COOLDOWN.reset();
     }
 
     @EventHandler

@@ -21,7 +21,7 @@ import java.util.Map;
 public final class AbilityRegistry {
     public static final String ABILITY_ATTRIBUTE_MODIFIER_NAME = "Ability Modifier";
 
-    private static final long ABILITY_ATTRIBUTE_CHECK_INTERVAL = 20L;
+    private static final long ABILITY_ATTRIBUTE_CHECK_INTERVAL = 5L * 20L;
     private static final ArrayList<Ability> ABILITIES = new ArrayList<>();
     private static final HashMap<Ability, BukkitTask> ABILITY_BUKKIT_TASK_MAP = new HashMap<>();
 
@@ -54,28 +54,34 @@ public final class AbilityRegistry {
         }
 
         private void applyModifiers(Player player) {
+            if (player == null) {
+                return;
+            }
+
             for (Attribute attribute : Attribute.values()) {
                 AttributeInstance attributeInstance = player.getAttribute(attribute);
 
-                if (attributeInstance != null) {
-                    for (AttributeModifier modifier : attributeInstance.getModifiers()) {
-                        if (!modifier.getName().equalsIgnoreCase(ABILITY_ATTRIBUTE_MODIFIER_NAME)) {
-                            continue;
-                        }
+                if (attributeInstance == null) {
+                    continue;
+                }
 
-                        attributeInstance.removeModifier(modifier);
+                for (AttributeModifier modifier : attributeInstance.getModifiers()) {
+                    if (!modifier.getName().equalsIgnoreCase(ABILITY_ATTRIBUTE_MODIFIER_NAME)) {
+                        continue;
                     }
 
-                    for (Ability ability : ABILITIES) {
-                        if (!ability.isOwner(player)) {
-                            continue;
-                        }
+                    attributeInstance.removeModifier(modifier);
+                }
 
-                        AttributeModifier[] modifiers = ability.getAttributeModifiers(attribute);
+                for (Ability ability : ABILITIES) {
+                    if (!ability.isOwner(player)) {
+                        continue;
+                    }
 
-                        for (AttributeModifier modifier : modifiers) {
-                            attributeInstance.addModifier(modifier);
-                        }
+                    AttributeModifier[] modifiers = ability.getAttributeModifiers(attribute);
+
+                    for (AttributeModifier modifier : modifiers) {
+                        attributeInstance.addModifier(modifier);
                     }
                 }
             }

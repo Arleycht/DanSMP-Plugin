@@ -1,5 +1,6 @@
 package io.github.arleycht.SMP.Abilities;
 
+import io.github.arleycht.SMP.util.Cooldown;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -15,20 +16,19 @@ import java.util.Collection;
 import java.util.Random;
 
 public class SheepAbility extends Ability {
-    public static final long TASK_UPDATE_INTERVAL_TICKS = 20L;
+    public static final long TASK_INTERVAL_TICKS = 20L;
 
     public static final double WOLF_AGGRO_RANGE = 15.0;
 
     public static final int FOOD_LEVEL_INCREMENT = 1;
     public static final float SATURATION_LEVEL_INCREMENT = 0.25f;
-    public static final long EAT_COOLDOWN_MS = 5L * 1000L;
+    public static final Cooldown EAT_COOLDOWN_MS = new Cooldown(5.0);
 
     public static final int WOOL_GENERATION_MIN = 4;
     public static final int WOOL_GENERATION_MAX = 10;
-    public static final long GENERATION_COOLDOWN_MS = 25000L;
+    public static final Cooldown GENERATION_COOLDOWN = new Cooldown(25.0);
 
     private long lastEatenTime = 0;
-    private long lastGeneratedTime = 0;
     private boolean eaten = false;
 
     @Override
@@ -38,7 +38,7 @@ public class SheepAbility extends Ability {
 
     @Override
     public long getTaskIntervalTicks() {
-        return TASK_UPDATE_INTERVAL_TICKS;
+        return TASK_INTERVAL_TICKS;
     }
 
     @Override
@@ -88,8 +88,9 @@ public class SheepAbility extends Ability {
                 ItemStack heldItem = inventory.getItem(EquipmentSlot.HAND);
 
                 if (heldItem.getType() == Material.SHEARS) {
-                    if (currentTime - lastGeneratedTime > GENERATION_COOLDOWN_MS) {
-                        lastGeneratedTime = currentTime;
+                    if (GENERATION_COOLDOWN.isReady()) {
+                        GENERATION_COOLDOWN.reset();
+
                         eaten = false;
 
                         Random rng = new Random();
@@ -105,12 +106,13 @@ public class SheepAbility extends Ability {
                 }
             }
 
-            Block block = event.getClickedBlock();
-            Material conversionType = getConversionType(block);
+            if (EAT_COOLDOWN_MS.isReady()) {
+                Block block = event.getClickedBlock();
+                Material conversionType = getConversionType(block);
 
-            if (block != null && conversionType != null) {
-                if (currentTime - lastEatenTime > EAT_COOLDOWN_MS) {
-                    lastEatenTime = currentTime;
+                if (block != null && conversionType != null) {
+                    EAT_COOLDOWN_MS.reset();
+
                     eaten = true;
 
                     block.setType(conversionType);

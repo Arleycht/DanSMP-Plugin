@@ -76,6 +76,10 @@ public class SheepAbility extends Ability {
     }
 
     private Material getConversionType(Block block) {
+        if (block == null) {
+            return null;
+        }
+        
         switch (block.getType()) {
             case GRASS_BLOCK:
                 return Material.DIRT;

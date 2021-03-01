@@ -72,7 +72,7 @@ public abstract class Ability implements Listener, Runnable {
     }
 
     public void addAttributeModifier(Attribute attribute, double amount, AttributeModifier.Operation operation) {
-        AttributeModifier modifier = new AttributeModifier(getName(), amount, operation);
+        AttributeModifier modifier = new AttributeModifier(AbilityRegistry.ABILITY_ATTRIBUTE_MODIFIER_NAME, amount, operation);
 
         if (!attributeModifiers.containsKey(attribute)) {
             attributeModifiers.put(attribute, new ArrayList<>());

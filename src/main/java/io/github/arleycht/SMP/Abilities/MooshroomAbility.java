@@ -16,7 +16,7 @@ import org.bukkit.inventory.PlayerInventory;
 import java.util.Map;
 
 public class MooshroomAbility extends Ability {
-    // TODO: Produce suspiscious "milk"
+    // TODO: Produce suspicious "milk"
     // TODO: Grow BIG mushrooms on the spot or something
     public static final Cooldown MILK_COOLDOWN = new Cooldown(60.0);
     public static final Cooldown STEW_COOLDOWN = new Cooldown(90.0);
@@ -87,5 +87,15 @@ public class MooshroomAbility extends Ability {
         }
 
         target.getWorld().playSound(target.getLocation(), interactionSound, 1.0f, 1.0f);
+    }
+
+    @Override
+    public String getName() {
+        return "Literally a Mooshroom";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Produce milk and stew like a moo-moo.";
     }
 }

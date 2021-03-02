@@ -13,6 +13,7 @@ import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -78,7 +79,9 @@ public class CreepyManAbility extends Ability {
                 }
 
                 if (closestPlayer != null && isOwner(closestPlayer)) {
-                    event.setCancelled(true);
+                    soundPacket.setVolume(soundPacket.getVolume() * 0.5f);
+
+                    event.setPacket(soundPacket.getHandle());
                 }
             }
         };
@@ -131,12 +134,18 @@ public class CreepyManAbility extends Ability {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
+        Action action = event.getAction();
+
+        if (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK) {
+            return;
+        }
+
         Player player = event.getPlayer();
         EquipmentSlot hand = event.getHand();
         ItemStack heldItemStack = player.getInventory().getItem(hand);
         Material heldItemType = heldItemStack.getType();
 
-        if (hand != EquipmentSlot.HAND || heldItemType != ABILITY_ITEM) {
+        if (!isOwner(player) || hand != EquipmentSlot.HAND || heldItemType != ABILITY_ITEM) {
             return;
         }
 

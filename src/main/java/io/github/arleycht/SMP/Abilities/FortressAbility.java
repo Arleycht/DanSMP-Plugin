@@ -5,8 +5,9 @@ import org.bukkit.attribute.AttributeModifier;
 
 public class FortressAbility extends Ability {
     public static final double ADD_ARMOR = 5.0;
-    public static final double ADD_KNOCKBACK_RESISTANCE = 0.6;
-    public static final double MOVEMENT_SPEED_MODIFIER = -0.15;
+    public static final double KNOCKBACK_RESISTANCE_ADD = 0.4;
+    public static final double MOVEMENT_SPEED_MUL = -0.15;
+    public static final double ATTACK_SPEED_MUL = -0.1;
 
     @Override
     public void initialize() {
@@ -14,8 +15,9 @@ public class FortressAbility extends Ability {
         AttributeModifier.Operation mul = AttributeModifier.Operation.ADD_SCALAR;
 
         addAttributeModifier(Attribute.GENERIC_ARMOR, ADD_ARMOR, add);
-        addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, ADD_KNOCKBACK_RESISTANCE, add);
-        addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED, MOVEMENT_SPEED_MODIFIER, mul);
+        addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, KNOCKBACK_RESISTANCE_ADD, add);
+        addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED, MOVEMENT_SPEED_MUL, mul);
+        addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, ATTACK_SPEED_MUL, mul);
     }
 
     @Override

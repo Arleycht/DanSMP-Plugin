@@ -108,7 +108,7 @@ public class BeeAbility extends Ability {
 
     @Override
     public String getName() {
-        return "Queen Bee";
+        return "Queen V";
     }
 
     @Override

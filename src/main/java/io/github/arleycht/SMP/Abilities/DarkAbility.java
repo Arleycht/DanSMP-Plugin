@@ -106,11 +106,11 @@ public class DarkAbility extends Ability {
 
     @Override
     public String getName() {
-        return "Dark Embrace";
+        return "In the Dark";
     }
 
     @Override
     public String getDescription() {
-        return "You are twice damaging in night, and twice damaged in day.";
+        return "You are twice damaging at night, and twice damaged at day.";
     }
 }

@@ -106,11 +106,11 @@ public class LightAbility extends Ability {
 
     @Override
     public String getName() {
-        return "Beckoner of Light";
+        return "In the Light";
     }
 
     @Override
     public String getDescription() {
-        return "You are twice damaging in day, and twice damaged in night.";
+        return "You are twice damaging at day, and twice damaged at night.";
     }
 }

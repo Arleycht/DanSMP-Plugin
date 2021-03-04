@@ -10,6 +10,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -59,6 +60,20 @@ public class BeeAbility extends Ability {
         player.getInventory().addItem(honeyBottle);
 
         HONEY_BOTTLE_GENERATION_COOLDOWN.reset();
+    }
+
+    @EventHandler
+    public void onEntityTargetEvent(EntityTargetEvent event) {
+        Entity entity = event.getEntity();
+        Entity target = event.getTarget();
+
+        if (entity instanceof Bee && isOwner(target)) {
+            Bee bee = (Bee) entity;
+
+            bee.setTarget(null);
+
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler

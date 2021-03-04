@@ -12,9 +12,6 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public abstract class Ability implements Listener, Runnable {
-    public static final String NO_NAME = "Blank Ability";
-    public static final String NO_DESCRIPTION = "No description.";
-
     protected Plugin plugin;
     protected Actor owner;
 
@@ -41,38 +38,30 @@ public abstract class Ability implements Listener, Runnable {
 
     }
 
-    public boolean isOwner(Entity entity) {
-        if (owner == null || entity == null) {
+    public boolean isOwner(UUID uuid) {
+        if (uuid == null) {
             return false;
         }
 
-        if (owner.getUsername().equalsIgnoreCase(entity.getName())) {
-            return true;
-        } else {
-            UUID uuid = owner.getUniqueId();
+        return uuid.equals(owner.getUniqueId());
+    }
 
-            if (uuid != null) {
-                return uuid.equals(entity.getUniqueId());
-            }
+    public boolean isOwner(Entity entity) {
+        if (entity == null) {
+            return false;
         }
 
-        return false;
+        return isOwner(entity.getUniqueId());
     }
 
-    public String getName() {
-        return NO_NAME;
-    }
-
-    public String getDescription() {
-        return NO_DESCRIPTION;
-    }
+    public abstract String getName();
+    public abstract String getDescription();
 
     public AttributeModifier[] getAttributeModifiers(Attribute attribute) {
         if (attributeModifiers.containsKey(attribute)) {
             ArrayList<AttributeModifier> modifiers = attributeModifiers.get(attribute);
-            AttributeModifier[] modifierArray = new AttributeModifier[modifiers.size()];
 
-            return modifiers.toArray(modifierArray);
+            return modifiers.toArray(new AttributeModifier[modifiers.size()]);
         }
 
         return new AttributeModifier[0];

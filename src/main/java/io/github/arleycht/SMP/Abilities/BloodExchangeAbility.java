@@ -1,5 +1,7 @@
 package io.github.arleycht.SMP.Abilities;
 
+import io.github.arleycht.SMP.Abilities.DeathMessage.DeathMessageHandler;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Damageable;
@@ -7,7 +9,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
@@ -15,9 +16,16 @@ public class BloodExchangeAbility extends Ability {
     public static final Material ABILITY_ITEM = Material.SPECTRAL_ARROW;
     public static final double TRANSFER_RATE = 1.0;
 
-    public static final String OVERUSE_DEATH_MESSAGE = "%s died to charitable causes";
+    public static final String[] DEATH_MESSAGES = {
+            "{0} died to charitable causes",
+            "{0} gave away too much",
+            "{0} sacrificed their blood"
+    };
 
-    private boolean diedToOveruse = false;
+    @Override
+    public void initialize() {
+        DeathMessageHandler.setDeathMessages(this, DEATH_MESSAGES);
+    }
 
     @EventHandler
     public void onItemUse(PlayerInteractEntityEvent event) {
@@ -47,22 +55,22 @@ public class BloodExchangeAbility extends Ability {
             double newSourceHealth = sourceHealth - transferred;
 
             if (transferred > 0.0) {
-                if (newSourceHealth <= 0.0) {
-                    diedToOveruse = true;
+                target.setHealth(newTargetHealth);
+
+                if (player.getGameMode() == GameMode.CREATIVE) {
+                    return;
                 }
 
-                player.setHealth(newSourceHealth);
-                target.setHealth(newTargetHealth);
+                if (newSourceHealth <= 0.0) {
+                    if (Math.random() < 0.5) {
+                        DeathMessageHandler.setNextDeathMessage(player.getUniqueId(), this);
+                    } else {
+                        player.damage(transferred, target);
+                    }
+                } else {
+                    player.setHealth(newSourceHealth);
+                }
             }
-        }
-    }
-
-    @EventHandler
-    public void onPlayerDeath(PlayerDeathEvent event) {
-        if (diedToOveruse && isOwner(event.getEntity())) {
-            diedToOveruse = false;
-
-            event.setDeathMessage(String.format(OVERUSE_DEATH_MESSAGE, owner.getUsername()));
         }
     }
 

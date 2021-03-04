@@ -17,6 +17,7 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public final class AbilityRegistry {
     public static final String ABILITY_ATTRIBUTE_MODIFIER_NAME = "Ability Modifier";
@@ -88,22 +89,20 @@ public final class AbilityRegistry {
         }
     }
 
-    public static <T extends Ability> Ability registerAbility(String username, Class<T> t, Plugin plugin) {
+    public static <T extends Ability> void registerAbility(String realName, Class<T> t, Plugin plugin) {
         if (plugin == null) {
             throw new NullPointerException("AbilityRegistry plugin must be set before registering abilities!");
         }
 
-        if (username == null) {
-            throw new NullPointerException("A valid username must be provided!");
+        if (realName == null) {
+            throw new IllegalArgumentException("A valid realName must be provided!");
         }
 
-        Actor actor = ActorRegistry.getCharacterFromUsername(username);
+        Actor actor = ActorRegistry.getActorFromRealName(realName);
 
         if (actor == null) {
-            actor = ActorRegistry.addActor(null, username);
-
-            String msg = "'%s' was not previously registered!";
-            Bukkit.getLogger().warning(String.format(msg, username));
+            String msg = "'%s' is not a registered name!";
+            throw new IllegalArgumentException(String.format(msg, realName));
         }
 
         T ability;
@@ -120,21 +119,44 @@ public final class AbilityRegistry {
             ability.initialize();
 
             String msg = "Registered ability '%s' to '%s'";
-            Bukkit.getLogger().info(String.format(msg, ability.getName(), username));
+            Bukkit.getLogger().info(String.format(msg, ability.getName(), realName));
 
-            return ability;
         } catch (Exception e) {
             e.printStackTrace();
 
             String msg = "Failed to instantiate ability '%s'";
-            Bukkit.getLogger().severe(String.format(msg, String.valueOf(t)));
-
-            return null;
+            Bukkit.getLogger().severe(String.format(msg, t.toString()));
         }
     }
 
     public static Ability[] getRegisteredAbilities() {
-        return (Ability[]) ABILITIES.toArray();
+        return ABILITIES.toArray(new Ability[0]);
+    }
+
+    public static Ability[] getAbilities(UUID ownerUuid) {
+        ArrayList<Ability> abilities = new ArrayList<>();
+
+        for (Ability ability : ABILITIES) {
+            if (ability.isOwner(ownerUuid)) {
+                abilities.add(ability);
+            }
+        }
+
+        return abilities.toArray(new Ability[0]);
+    }
+
+    public static Ability[] getAbilities(Player player) {
+        return getAbilities(player.getUniqueId());
+    }
+
+    public static <T extends Ability> Ability getAbility(UUID ownerUuid, Class<T> abilityClass) {
+        for (Ability ability : ABILITIES) {
+            if (abilityClass.isInstance(ability) && ability.isOwner(ownerUuid)) {
+                return ability;
+            }
+        }
+
+        return null;
     }
 
     public static Plugin getPlugin() {
@@ -168,7 +190,7 @@ public final class AbilityRegistry {
         }, 0L, ABILITY_ATTRIBUTE_CHECK_INTERVAL);
     }
 
-    public static BukkitTask scheduleAbilityTask(Ability ability) {
+    public static void scheduleAbilityTask(Ability ability) {
         if (ability == null) {
             throw new NullPointerException("Cannot schedule null ability!");
         }
@@ -180,7 +202,7 @@ public final class AbilityRegistry {
                 String msg = "Attempted to schedule '%s', but it's already scheduled!";
                 Bukkit.getLogger().warning(String.format(msg, ability.getName()));
 
-                return task;
+                return;
             }
 
             task = Bukkit.getScheduler().runTaskTimer(plugin, ability, 0L, ability.getTaskIntervalTicks());
@@ -189,14 +211,10 @@ public final class AbilityRegistry {
 
             String msg = "Scheduled task for ability '%s'";
             Bukkit.getLogger().info(String.format(msg, ability.getName()));
-
-            return task;
         } else if (ability.getTaskIntervalTicks() != -1L) {
             String msg = "Ability '%s' has a non-zero task interval but is not runnable!";
             Bukkit.getLogger().warning(String.format(msg, ability.getName()));
         }
-
-        return null;
     }
 
     public static void cancelAbilityTask(Ability ability) {

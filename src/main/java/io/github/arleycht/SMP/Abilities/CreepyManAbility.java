@@ -7,6 +7,7 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
+import io.github.arleycht.SMP.Abilities.DeathMessage.DeathMessageHandler;
 import io.github.arleycht.SMP.util.Cooldown;
 import org.bukkit.*;
 import org.bukkit.entity.Creeper;
@@ -15,7 +16,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityTargetEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -28,14 +28,18 @@ public class CreepyManAbility extends Ability {
     // Your ability: self-destruction
     public static final Material ABILITY_ITEM = Material.GUNPOWDER;
     public static final long ABILITY_DELAY_TICKS = 10L;
-    public static final String ABILITY_DEATH_MESSAGE = "%s blew up canonically";
+    public static final String[] ABILITY_DEATH_MESSAGES = {
+            "{0} blew up canonically",
+            "{0}'s insides became outsides",
+            "{0} went boom"
+    };
 
     private PacketAdapter packetAdapter;
 
-    private boolean isSelfInflicted = false;
-
     @Override
     public void initialize() {
+        DeathMessageHandler.setDeathMessages(this, ABILITY_DEATH_MESSAGES);
+
         GENERATION_COOLDOWN.reset();
 
         if (packetAdapter != null) {
@@ -122,7 +126,7 @@ public class CreepyManAbility extends Ability {
         Entity entity = event.getEntity();
         Entity target = event.getTarget();
 
-        if (entity == null || target == null) {
+        if (target == null) {
             return;
         }
 
@@ -141,38 +145,29 @@ public class CreepyManAbility extends Ability {
         }
 
         Player player = event.getPlayer();
-        EquipmentSlot hand = event.getHand();
-        ItemStack heldItemStack = player.getInventory().getItem(hand);
+        ItemStack heldItemStack = player.getInventory().getItem(EquipmentSlot.HAND);
         Material heldItemType = heldItemStack.getType();
 
-        if (!isOwner(player) || hand != EquipmentSlot.HAND || heldItemType != ABILITY_ITEM) {
+        if (!isOwner(player) || heldItemType != ABILITY_ITEM) {
             return;
         }
 
         heldItemStack.setAmount(heldItemStack.getAmount() - 1);
 
-        isSelfInflicted = true;
-
         World world = player.getWorld();
 
-        world.playSound(player.getLocation(),  Sound.ENTITY_CREEPER_PRIMED, 1.0f, 2.0f);
+        world.playSound(player.getLocation(), Sound.ENTITY_CREEPER_PRIMED, 1.0f, 2.0f);
 
-        Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
-            @Override
-            public void run() {
-                world.createExplosion(player.getLocation(), 6.0f, false, true, player);
-                player.setHealth(0.0);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (player.getHealth() <= 0.0) {
+                return;
             }
+
+            DeathMessageHandler.setNextDeathMessage(player.getUniqueId(), this);
+
+            world.createExplosion(player.getLocation(), 6.0f, false, true, player);
+            player.setHealth(0.0);
         }, ABILITY_DELAY_TICKS);
-    }
-
-    @EventHandler
-    public void onPlayerDeath(PlayerDeathEvent event) {
-        if (isSelfInflicted && isOwner(event.getEntity())) {
-            isSelfInflicted = false;
-
-            event.setDeathMessage(String.format(ABILITY_DEATH_MESSAGE, owner.getUsername()));
-        }
     }
 
     @Override

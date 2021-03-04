@@ -1,43 +1,28 @@
 package io.github.arleycht.SMP.Characters;
 
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
 public class Actor {
-	public static final String NO_NAME = "<NO_NAME>";
-	public static final String NO_USERNAME = "<NO_USER>";
+	public static final String NO_REAL_NAME = "<NO_NAME>";
 	
-	protected String realName;
-	protected String username;
+	protected final String realName;
+	protected final String username;
+	protected UUID ownerUuid;
 	
-	public Actor() {
-		realName = NO_NAME;
-		username = NO_USERNAME;
-	}
-	
-	public Actor(String realName, String username) {
-		this.realName = realName != null ? realName : NO_NAME;
-		this.username = username != null ? username : NO_USERNAME;
-	}
+	public Actor(String realName, UUID uuid) {
+		OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
 
-	public Player getPlayer() {
-		Player player = Bukkit.getPlayer(username);
-
-		return player;
+		this.realName = (realName != null) ? realName : NO_REAL_NAME;
+		this.username = offlinePlayer.getName();
+		this.ownerUuid = offlinePlayer.getUniqueId();
 	}
 
 	public UUID getUniqueId() {
-		return ActorRegistry.getUUIDFromUsername(username);
-	}
-
-	public void setRealName(String realName) {
-		this.realName = realName;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
+		return ownerUuid;
 	}
 
 	public String getRealName() {
@@ -48,16 +33,23 @@ public class Actor {
 		return username;
 	}
 
+	public Player getPlayer() {
+		return Bukkit.getPlayer(ownerUuid);
+	}
+
 	public boolean equals(Actor other) {
 		if (other == null) {
 			return false;
 		}
 
-		return username.equalsIgnoreCase(other.getUsername()) || getUniqueId().equals(other.getUniqueId());
+		return getUniqueId().equals(other.getUniqueId());
 	}
 
 	public String toString() {
-		String s = "%s (%s)";
-		return String.format(s, username, realName);
+		if (realName.equals(NO_REAL_NAME)) {
+			return username;
+		}
+
+		return realName;
 	}
 }

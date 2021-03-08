@@ -89,7 +89,7 @@ public final class AbilityRegistry {
         }
     }
 
-    public static <T extends Ability> void registerAbility(String realName, Class<T> t, Plugin plugin) {
+    public static <T extends Ability> void registerAbility(String realName, Class<T> abilityClass, Plugin plugin) {
         if (plugin == null) {
             throw new NullPointerException("AbilityRegistry plugin must be set before registering abilities!");
         }
@@ -108,7 +108,7 @@ public final class AbilityRegistry {
         T ability;
 
         try {
-            ability = t.newInstance();
+            ability = abilityClass.newInstance();
             ability.setPlugin(plugin);
             ability.setOwner(actor);
 
@@ -125,7 +125,7 @@ public final class AbilityRegistry {
             e.printStackTrace();
 
             String msg = "Failed to instantiate ability '%s'";
-            Bukkit.getLogger().severe(String.format(msg, t.toString()));
+            Bukkit.getLogger().severe(String.format(msg, abilityClass.toString()));
         }
     }
 

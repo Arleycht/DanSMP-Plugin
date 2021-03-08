@@ -62,13 +62,12 @@ public class SheepAbility extends Ability {
             return;
         }
 
-        World world = player.getWorld();
-        Location location = player.getLocation();
-
         double size = WOLF_AGGRO_RANGE;
         double sizeSquared = Math.pow(size, 2.0);
 
-        Collection<Entity> entities = world.getNearbyEntities(location, size, size, size);
+        Collection<Entity> entities = player.getNearbyEntities(size, size, size);
+
+        Location location = player.getLocation();
 
         for (Entity entity : entities) {
             if (entity instanceof Wolf) {

@@ -1,43 +1,44 @@
 package io.github.arleycht.SMP.Abilities;
 
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.EntityToggleGlideEvent;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 public class SkyWandererAbility extends Ability {
-    public static final long TASK_INTERVAL_TICKS = 5L;
-
-    private ItemStack originalItem;
-    private int originalElytraSlot;
-
-    private boolean wasOnGround = false;
+    public static final double ADD_HEALTH = -4.0;
 
     @Override
-    public boolean isRunnable() {
-        return true;
+    public void initialize() {
+        AttributeModifier.Operation add = AttributeModifier.Operation.ADD_NUMBER;
+
+        addAttributeModifier(Attribute.GENERIC_MAX_HEALTH, ADD_HEALTH, add);
     }
 
-    @Override
-    public long getTaskIntervalTicks() {
-        return TASK_INTERVAL_TICKS;
+    @EventHandler
+    public void onPlayerToggleSneakEvent(PlayerToggleSneakEvent event) {
+        Player player = event.getPlayer();
+
+        if (isOwner(player) && player.isSneaking() && !player.isOnGround()) {
+            player.setGliding(true);
+        }
     }
 
-    @Override
-    public void run() {
-        Player player = owner.getPlayer();
+    @EventHandler
+    public void onEntityToggleGlideEvent(EntityToggleGlideEvent event) {
+        Entity entity = event.getEntity();
 
-        if (player != null) {
-            boolean isOnGround = player.isOnGround();
+        if (entity instanceof Player) {
+            Player player = (Player) entity;
 
-            if (wasOnGround != isOnGround) {
-                wasOnGround = isOnGround;
-
-                if (isOnGround) {
-                    unequipElytra(player);
-                } else {
-                    equipElytra(player);
-                }
+            if (isOwner(player) && !player.isOnGround() && !player.isFlying()) {
+                event.setCancelled(true);
             }
         }
     }
@@ -62,13 +63,5 @@ public class SkyWandererAbility extends Ability {
         }
 
         return -1;
-    }
-
-    private void equipElytra(Player player) {
-
-    }
-
-    private void unequipElytra(Player player) {
-
     }
 }

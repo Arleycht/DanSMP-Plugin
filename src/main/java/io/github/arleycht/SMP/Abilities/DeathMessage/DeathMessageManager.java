@@ -10,11 +10,11 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import java.text.MessageFormat;
 import java.util.*;
 
-public final class DeathMessageHandler implements Listener {
+public final class DeathMessageManager implements Listener {
     // Player should die
     public static final long MESSAGE_TIMEOUT_MS = 3L * 1000L;
 
-    private static final DeathMessageHandler INSTANCE;
+    private static final DeathMessageManager INSTANCE;
 
     private static final HashMap<Ability, List<String>> REGISTERED_MESSAGES = new HashMap<>();
     private static final HashMap<UUID, Pair<Ability, Long>> NEXT_MESSAGES = new HashMap<>();
@@ -22,14 +22,14 @@ public final class DeathMessageHandler implements Listener {
     private static final Random RANDOM = new Random();
 
     static {
-        INSTANCE = new DeathMessageHandler();
+        INSTANCE = new DeathMessageManager();
     }
 
-    private DeathMessageHandler() {
+    private DeathMessageManager() {
 
     }
 
-    public static DeathMessageHandler getInstance() {
+    public static DeathMessageManager getInstance() {
         return INSTANCE;
     }
 

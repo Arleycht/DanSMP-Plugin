@@ -1,6 +1,7 @@
 package io.github.arleycht.SMP.Abilities;
 
-import io.github.arleycht.SMP.util.Cooldown;
+import io.github.arleycht.SMP.Abilities.DeathMessage.DeathMessageManager;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -8,62 +9,69 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityToggleGlideEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitTask;
 
 public class WyvernAbility extends Ability {
     public static final long TASK_INTERVAL_TICKS = 1L;
     public static final double RAIN_DAMAGE = 1.0;
+    public static final long RAIN_DAMAGE_INTERVAL_TICKS = 40L;
 
-    public static final String RAIN_DEATH_MESSAGE = "%s died to water";
-    public static final String WATER_DEATH_MESSAGE = "%s couldn't swim";
+    public static final String[] DEATH_MESSAGES = {
+            "{0} had their life extinguished by water",
+            "{0} couldn't swim",
+            "{0} died as they begged the question"
+    };
 
-    private static final Cooldown RAIN_DAMAGE_COOLDOWN = new Cooldown(2.0);
-
-
-    private boolean isDeadToRain = false;
+    private BukkitTask rainDamageTask = null;
 
     @Override
-    public boolean isRunnable() {
-        return true;
+    public void initialize() {
+        DeathMessageManager.setDeathMessages(this, DEATH_MESSAGES);
     }
 
-    @Override
-    public long getTaskIntervalTicks() {
-        return TASK_INTERVAL_TICKS;
-    }
-
-    @Override
-    public void run() {
-        Player player = owner.getPlayer();
-
-        if (player != null) {
-            World world = player.getWorld();
-
-            if (world.getWeatherDuration() > 0) {
-                if (RAIN_DAMAGE_COOLDOWN.isReady()) {
-                    Location location = player.getLocation();
-
-                    int x = (int) location.getX();
-                    int z = (int) location.getZ();
-
-                    for (int y = (int) location.getY(); y < world.getMaxHeight(); ++y) {
-                        if (world.getBlockAt(x, y, z).getType() != Material.AIR) {
-                            return;
-                        }
-                    }
-
-                    RAIN_DAMAGE_COOLDOWN.reset();
-
-                    if (player.getHealth() <= RAIN_DAMAGE) {
-                        isDeadToRain = true;
-                    }
-
-                    player.damage(RAIN_DAMAGE);
-                }
+    @EventHandler
+    public void WeatherChangeEvent(WeatherChangeEvent event) {
+        if (event.toWeatherState()) {
+            if (rainDamageTask != null) {
+                rainDamageTask.cancel();
             }
+
+            rainDamageTask = Bukkit.getScheduler().runTaskTimer(getPlugin(), () -> {
+                Player player = owner.getPlayer();
+
+                if (player == null) {
+                    return;
+                }
+
+                // Check sky access
+
+                World world = event.getWorld();
+                Location location = player.getLocation();
+
+                int x = (int) location.getX();
+                int z = (int) location.getZ();
+
+                for (int y = (int) location.getY(); y < world.getMaxHeight(); ++y) {
+                    if (world.getBlockAt(x, y, z).getType() != Material.AIR) {
+                        return;
+                    }
+                }
+
+                // Set death message
+
+                if (player.getHealth() <= RAIN_DAMAGE) {
+                    DeathMessageManager.setNextDeathMessage(player.getUniqueId(), this);
+                }
+
+                player.damage(RAIN_DAMAGE);
+
+            }, RAIN_DAMAGE_INTERVAL_TICKS, RAIN_DAMAGE_INTERVAL_TICKS);
+        } else if (rainDamageTask != null) {
+            rainDamageTask.cancel();
         }
     }
 
@@ -74,15 +82,6 @@ public class WyvernAbility extends Ability {
 
         if (isOwner(player) && itemStack.getType() == Material.POTION) {
 
-        }
-    }
-
-    @EventHandler
-    public void onPlayerDeathEvent(PlayerDeathEvent event) {
-        if (isDeadToRain && isOwner(event.getEntity())) {
-            isDeadToRain = false;
-
-            event.setDeathMessage(RAIN_DEATH_MESSAGE);
         }
     }
 

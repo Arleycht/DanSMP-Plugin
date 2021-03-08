@@ -12,17 +12,14 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-public abstract class AbilityToken {
+public class AbilityToken {
     public static final String TOKEN_TITLE = "Ability Token";
 
-    public abstract String getTokenName();
-
-    public abstract void applyAbility(Player player);
-
-    public abstract void removeAbility(Player player);
+    public static final HashMap<String, Class<? extends MinorAbility>> TOKEN_ABILITIES = new HashMap<>();
 
     /**
      * Creates a token for a player's ability.

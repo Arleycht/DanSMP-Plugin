@@ -1,7 +1,7 @@
 package io.github.arleycht.SMP;
 
 import io.github.arleycht.SMP.Abilities.*;
-import io.github.arleycht.SMP.Abilities.DeathMessage.DeathMessageHandler;
+import io.github.arleycht.SMP.Abilities.DeathMessage.DeathMessageManager;
 import io.github.arleycht.SMP.Characters.ActorRegistry;
 import io.github.arleycht.SMP.Commands.SMPCommandExecutor;
 import org.bukkit.command.CommandExecutor;
@@ -109,11 +109,11 @@ public class DanSMP extends JavaPlugin {
     private void initializeAbilities() {
         AbilityRegistry.setPlugin(this);
 
-        getServer().getPluginManager().registerEvents(DeathMessageHandler.getInstance(), this);
+        getServer().getPluginManager().registerEvents(DeathMessageManager.getInstance(), this);
 
         // TODO: Have these stored in JSON files too, my goodness
 
-        AbilityRegistry.registerAbility("Daniel", CreepyManAbility.class, this);
+        AbilityRegistry.registerAbility("Daniel", CreeperAbility.class, this);
         AbilityRegistry.registerAbility("Isaias", BloodExchangeAbility.class, this);
         AbilityRegistry.registerAbility("Artemio", FortressAbility.class, this);
         AbilityRegistry.registerAbility("Chris", DarkAbility.class, this);
@@ -122,17 +122,17 @@ public class DanSMP extends JavaPlugin {
         AbilityRegistry.registerAbility("Victoria", BeeAbility.class, this);
         AbilityRegistry.registerAbility("Nyla", MooshroomAbility.class, this);
 
-        AbilityRegistry.registerAbility("Andy", CreepyManAbility.class, this);
-        AbilityRegistry.registerAbility("Andy", MooshroomAbility.class, this);
+        //AbilityRegistry.registerAbility("Alex", CupidAbility.class, this);
+        //AbilityRegistry.registerAbility("Alex", LightAbility.class, this);
 
-        AbilityRegistry.registerAbility("Alex", WyvernAbility.class, this);
-        AbilityRegistry.registerAbility("Alex", BloodExchangeAbility.class, this);
-        AbilityRegistry.registerAbility("Alex", CreepyManAbility.class, this);
+        //AbilityRegistry.registerAbility("Andy", CreepyManAbility.class, this);
+        //AbilityRegistry.registerAbility("Andy", MooshroomAbility.class, this);
+
+        //AbilityRegistry.registerAbility("Alex", SkyWandererAbility.class, this);
+        //AbilityRegistry.registerAbility("Alex", CreeperAbility.class, this);
 
         //AbilityRegistry.registerAbility("Alex", CopyAbility.class, this);
         //AbilityRegistry.registerAbility("Daniel", CopyAbility.class, this);
-
-        //AbilityRegistry.registerAbility("Alex", DarkAbility.class, this);
     }
 
     private void registerCommand(String command, CommandExecutor executor) {

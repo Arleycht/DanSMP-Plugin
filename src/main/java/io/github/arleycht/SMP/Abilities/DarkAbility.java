@@ -1,7 +1,10 @@
 package io.github.arleycht.SMP.Abilities;
 
 import io.github.arleycht.SMP.util.Cooldown;
-import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.World;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -9,6 +12,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 public class DarkAbility extends Ability {
@@ -101,6 +105,18 @@ public class DarkAbility extends Ability {
 
         if (applyEffect) {
             event.setDamage(event.getDamage() * DAMAGE_MULTIPLIER);
+
+            World world = victim.getWorld();
+
+            BoundingBox box = victim.getBoundingBox();
+
+            double x = box.getWidthX();
+            double y = box.getHeight();
+            double z = box.getWidthZ();
+
+            Particle.DustOptions data = new Particle.DustOptions(Color.BLACK, 0.5f);
+
+            world.spawnParticle(Particle.REDSTONE, victim.getLocation(), 25, x, y, z, data);
         }
     }
 

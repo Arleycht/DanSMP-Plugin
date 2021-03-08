@@ -1,6 +1,6 @@
 package io.github.arleycht.SMP.Abilities;
 
-import io.github.arleycht.SMP.Abilities.DeathMessage.DeathMessageHandler;
+import io.github.arleycht.SMP.Abilities.DeathMessage.DeathMessageManager;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -24,7 +24,7 @@ public class BloodExchangeAbility extends Ability {
 
     @Override
     public void initialize() {
-        DeathMessageHandler.setDeathMessages(this, DEATH_MESSAGES);
+        DeathMessageManager.setDeathMessages(this, DEATH_MESSAGES);
     }
 
     @EventHandler
@@ -63,7 +63,7 @@ public class BloodExchangeAbility extends Ability {
 
                 if (newSourceHealth <= 0.0) {
                     if (Math.random() < 0.5) {
-                        DeathMessageHandler.setNextDeathMessage(player.getUniqueId(), this);
+                        DeathMessageManager.setNextDeathMessage(player.getUniqueId(), this);
                     } else {
                         player.damage(transferred, target);
                     }

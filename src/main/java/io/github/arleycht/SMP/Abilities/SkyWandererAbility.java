@@ -1,6 +1,5 @@
 package io.github.arleycht.SMP.Abilities;
 
-import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Entity;
@@ -8,8 +7,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityToggleGlideEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
 public class SkyWandererAbility extends Ability {
     public static final double ADD_HEALTH = -4.0;
@@ -51,17 +48,5 @@ public class SkyWandererAbility extends Ability {
     @Override
     public String getDescription() {
         return "A nomadic lifestyle of reduced health from the wears of travel.";
-    }
-
-    private int getElytraSlot(Inventory inventory) {
-        for (int i = 0; i < inventory.getSize(); ++i) {
-            ItemStack item = inventory.getItem(i);
-
-            if (item != null && item.getType() == Material.ELYTRA) {
-                return i;
-            }
-        }
-
-        return -1;
     }
 }

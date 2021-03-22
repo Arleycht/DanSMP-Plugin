@@ -18,8 +18,8 @@ import java.util.Map;
 public class MooshroomAbility extends Ability {
     // TODO: Produce suspicious "milk"
     // TODO: Grow BIG mushrooms on the spot or something
-    public static final Cooldown MILK_COOLDOWN = new Cooldown(60.0);
-    public static final Cooldown STEW_COOLDOWN = new Cooldown(90.0);
+    private Cooldown MILK_COOLDOWN = new Cooldown(60.0);
+    private Cooldown STEW_COOLDOWN = new Cooldown(90.0);
 
     @EventHandler
     public void onPlayerInteractEvent(PlayerInteractEvent event) {

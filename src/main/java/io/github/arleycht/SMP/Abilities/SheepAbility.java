@@ -25,7 +25,6 @@ public class SheepAbility extends Ability {
 
     public static final int FOOD_LEVEL_INCREMENT = 1;
     public static final float SATURATION_LEVEL_INCREMENT = 0.25f;
-    public static final Cooldown EAT_COOLDOWN_MS = new Cooldown(5.0);
 
     public static final Material[] VEGETARIAN_UNFRIENDLY = {
             Material.COD, Material.COOKED_COD,
@@ -40,7 +39,9 @@ public class SheepAbility extends Ability {
 
     public static final int WOOL_GENERATION_MIN = 4;
     public static final int WOOL_GENERATION_MAX = 10;
-    public static final Cooldown GENERATION_COOLDOWN = new Cooldown(25.0);
+
+    private Cooldown generationCooldown = new Cooldown(25.0);
+    private Cooldown eatCooldown = new Cooldown(5.0);
 
     private boolean nutritionAvailable = false;
 
@@ -128,8 +129,8 @@ public class SheepAbility extends Ability {
                 ItemStack heldItem = inventory.getItem(EquipmentSlot.HAND);
 
                 if (heldItem.getType() == Material.SHEARS) {
-                    if (GENERATION_COOLDOWN.isReady()) {
-                        GENERATION_COOLDOWN.reset();
+                    if (generationCooldown.isReady()) {
+                        generationCooldown.reset();
 
                         nutritionAvailable = false;
 
@@ -146,12 +147,12 @@ public class SheepAbility extends Ability {
                 }
             }
 
-            if (EAT_COOLDOWN_MS.isReady()) {
+            if (eatCooldown.isReady()) {
                 Block block = event.getClickedBlock();
                 Material conversionType = getConversionType(block);
 
                 if (block != null && conversionType != null) {
-                    EAT_COOLDOWN_MS.reset();
+                    eatCooldown.reset();
 
                     nutritionAvailable = true;
 

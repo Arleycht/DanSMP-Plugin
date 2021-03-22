@@ -21,8 +21,6 @@ import org.bukkit.inventory.ItemStack;
 public class CreeperAbility extends Ability {
     public static final long TASK_INTERVAL_TICKS = 60L * 20L;
 
-    public static final Cooldown GENERATION_COOLDOWN = new Cooldown(60 * 20);
-
     // Your ability: self-destruction
     public static final Material ABILITY_ITEM = Material.GUNPOWDER;
     public static final long ABILITY_DELAY_TICKS = 15L;
@@ -34,13 +32,15 @@ public class CreeperAbility extends Ability {
             "{0} went boom"
     };
 
+    private final Cooldown generationCooldown = new Cooldown(60 * 20);
+
     private PacketAdapter packetAdapter;
 
     @Override
     public void initialize() {
         DeathMessageManager.setDeathMessages(this, ABILITY_DEATH_MESSAGES);
 
-        GENERATION_COOLDOWN.reset();
+        generationCooldown.reset();
 
         if (packetAdapter != null) {
             ProtocolLibrary.getProtocolManager().removePacketListener(packetAdapter);
@@ -106,7 +106,7 @@ public class CreeperAbility extends Ability {
 
     @Override
     public void run() {
-        if (GENERATION_COOLDOWN.isNotReady()) {
+        if (generationCooldown.isNotReady()) {
             return;
         }
 
@@ -119,7 +119,7 @@ public class CreeperAbility extends Ability {
         ItemStack gunpowder = new ItemStack(Material.GUNPOWDER);
         player.getInventory().addItem(gunpowder);
 
-        GENERATION_COOLDOWN.reset();
+        generationCooldown.reset();
     }
 
     @EventHandler

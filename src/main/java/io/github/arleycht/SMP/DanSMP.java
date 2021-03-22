@@ -79,6 +79,8 @@ public class DanSMP extends JavaPlugin {
 
         ActorRegistry.addActor("Nyla", "4b8c2fd4-3cf4-4b77-9254-875c911806e6");
 
+        ActorRegistry.addActor("Reginald", "f0606323-6f95-4b1a-9ca0-703c1f10ef2f");
+
         ActorRegistry.addActor("Sage", "d8e15ac6-a9fa-421d-93b1-6d0e98c14dff");
         ActorRegistry.addActor("Sergio", "57a22258-0e09-48a9-84af-4e888b5ab2e0");
         ActorRegistry.addActor("Shelby", "ebbe93a2-6940-48b8-a49c-9b7befa4da9c");
@@ -101,7 +103,7 @@ public class DanSMP extends JavaPlugin {
         // Misc
 
         ActorRegistry.addActor("Jeff", "8f67331d-2036-4e6f-9df5-c56497eed54a");
-        ActorRegistry.addActor("Brayden", "ee6846d1-dcae-416e-8e9a-b944cb60777e");
+        ActorRegistry.addActor("Brandon", "ee6846d1-dcae-416e-8e9a-b944cb60777e");
 
         getLogger().info("DanSMP finished initialization!");
     }
@@ -114,25 +116,13 @@ public class DanSMP extends JavaPlugin {
         // TODO: Have these stored in JSON files too, my goodness
 
         AbilityRegistry.registerAbility("Daniel", CreeperAbility.class, this);
-        AbilityRegistry.registerAbility("Isaias", BloodExchangeAbility.class, this);
+        AbilityRegistry.registerAbility("Isaias", PaladinAbility.class, this);
         AbilityRegistry.registerAbility("Artemio", FortressAbility.class, this);
         AbilityRegistry.registerAbility("Chris", DarkAbility.class, this);
         AbilityRegistry.registerAbility("Sergio", LightAbility.class, this);
         AbilityRegistry.registerAbility("Sage", SheepAbility.class, this);
         AbilityRegistry.registerAbility("Victoria", BeeAbility.class, this);
         AbilityRegistry.registerAbility("Nyla", MooshroomAbility.class, this);
-
-        //AbilityRegistry.registerAbility("Alex", CupidAbility.class, this);
-        //AbilityRegistry.registerAbility("Alex", LightAbility.class, this);
-
-        //AbilityRegistry.registerAbility("Andy", CreepyManAbility.class, this);
-        //AbilityRegistry.registerAbility("Andy", MooshroomAbility.class, this);
-
-        //AbilityRegistry.registerAbility("Alex", SkyWandererAbility.class, this);
-        //AbilityRegistry.registerAbility("Alex", CreeperAbility.class, this);
-
-        //AbilityRegistry.registerAbility("Alex", CopyAbility.class, this);
-        //AbilityRegistry.registerAbility("Daniel", CopyAbility.class, this);
     }
 
     private void registerCommand(String command, CommandExecutor executor) {

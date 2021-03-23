@@ -123,6 +123,7 @@ public class DanSMP extends JavaPlugin {
         AbilityRegistry.registerAbility("Sage", SheepAbility.class, this);
         AbilityRegistry.registerAbility("Victoria", BeeAbility.class, this);
         AbilityRegistry.registerAbility("Nyla", MooshroomAbility.class, this);
+        AbilityRegistry.registerAbility("Tien", SkyWandererAbility.class, this);
         AbilityRegistry.registerAbility("Angela", WyvernAbility.class, this);
     }
 

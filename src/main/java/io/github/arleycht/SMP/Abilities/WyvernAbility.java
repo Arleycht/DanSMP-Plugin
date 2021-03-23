@@ -3,6 +3,7 @@ package io.github.arleycht.SMP.Abilities;
 import io.github.arleycht.SMP.Abilities.DeathMessage.DeathMessageManager;
 import io.github.arleycht.SMP.util.Cooldown;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
@@ -23,6 +24,8 @@ public class WyvernAbility extends Ability {
     public static final long TASK_INTERVAL_TICKS = 1L;
     public static final double RAIN_DAMAGE = 1.0;
     public static final long RAIN_DAMAGE_INTERVAL_TICKS = 40L;
+    public static final double SUBMERGE_DAMAGE = 1.0;
+    public static final long SUBMERGE_DAMAGE_INTERVAL_TICKS = 40L;
 
     public static final EntityDamageEvent.DamageCause[] DAMAGE_CAUSE_IMMUNITIES = {
         EntityDamageEvent.DamageCause.FIRE,
@@ -39,10 +42,92 @@ public class WyvernAbility extends Ability {
     private Cooldown fireballCooldown = new Cooldown(15.0);
 
     private BukkitTask rainDamageTask = null;
+    private BukkitTask submergeDamageTask = null;
 
     @Override
     public void initialize() {
         DeathMessageManager.setDeathMessages(this, DEATH_MESSAGES);
+    }
+
+    @Override
+    public boolean isRunnable() {
+        return true;
+    }
+
+    @Override
+    public long getTaskIntervalTicks() {
+        return TASK_INTERVAL_TICKS;
+    }
+
+    @Override
+    public void run() {
+        Player player = owner.getPlayer();
+
+        if (player != null) {
+            World world = player.getWorld();
+
+            Block block = world.getBlockAt(player.getLocation());
+
+            if (block.getType() == Material.WATER) {
+                if (submergeDamageTask != null && !submergeDamageTask.isCancelled()) {
+                    return;
+                }
+
+                submergeDamageTask = Bukkit.getScheduler().runTaskTimer(getPlugin(), () -> {
+                    // Set death message
+
+                    if (player.getHealth() <= SUBMERGE_DAMAGE) {
+                        DeathMessageManager.setNextDeathMessage(player.getUniqueId(), this);
+                    }
+
+                    player.damage(SUBMERGE_DAMAGE);
+                }, 0L, SUBMERGE_DAMAGE_INTERVAL_TICKS);
+            } else if (submergeDamageTask != null && !submergeDamageTask.isCancelled()) {
+                submergeDamageTask.cancel();
+            }
+        }
+    }
+
+    @EventHandler
+    public void WeatherChangeEvent(WeatherChangeEvent event) {
+        if (event.toWeatherState()) {
+            if (rainDamageTask != null) {
+                rainDamageTask.cancel();
+            }
+
+            rainDamageTask = Bukkit.getScheduler().runTaskTimer(getPlugin(), () -> {
+                Player player = owner.getPlayer();
+
+                if (player == null) {
+                    return;
+                }
+
+                // Check sky access
+
+                World world = event.getWorld();
+                Location location = player.getLocation();
+
+                int x = (int) location.getX();
+                int z = (int) location.getZ();
+
+                for (int y = (int) location.getY(); y < world.getMaxHeight(); ++y) {
+                    if (world.getBlockAt(x, y, z).getType() != Material.AIR) {
+                        return;
+                    }
+                }
+
+                // Set death message
+
+                if (player.getHealth() <= RAIN_DAMAGE) {
+                    DeathMessageManager.setNextDeathMessage(player.getUniqueId(), this);
+                }
+
+                player.damage(RAIN_DAMAGE);
+
+            }, RAIN_DAMAGE_INTERVAL_TICKS, RAIN_DAMAGE_INTERVAL_TICKS);
+        } else if (rainDamageTask != null) {
+            rainDamageTask.cancel();
+        }
     }
 
     @EventHandler
@@ -114,48 +199,6 @@ public class WyvernAbility extends Ability {
 
         fireball.setIsIncendiary(true);
         fireball.setYield(2.0f);
-    }
-
-    @EventHandler
-    public void WeatherChangeEvent(WeatherChangeEvent event) {
-        if (event.toWeatherState()) {
-            if (rainDamageTask != null) {
-                rainDamageTask.cancel();
-            }
-
-            rainDamageTask = Bukkit.getScheduler().runTaskTimer(getPlugin(), () -> {
-                Player player = owner.getPlayer();
-
-                if (player == null) {
-                    return;
-                }
-
-                // Check sky access
-
-                World world = event.getWorld();
-                Location location = player.getLocation();
-
-                int x = (int) location.getX();
-                int z = (int) location.getZ();
-
-                for (int y = (int) location.getY(); y < world.getMaxHeight(); ++y) {
-                    if (world.getBlockAt(x, y, z).getType() != Material.AIR) {
-                        return;
-                    }
-                }
-
-                // Set death message
-
-                if (player.getHealth() <= RAIN_DAMAGE) {
-                    DeathMessageManager.setNextDeathMessage(player.getUniqueId(), this);
-                }
-
-                player.damage(RAIN_DAMAGE);
-
-            }, RAIN_DAMAGE_INTERVAL_TICKS, RAIN_DAMAGE_INTERVAL_TICKS);
-        } else if (rainDamageTask != null) {
-            rainDamageTask.cancel();
-        }
     }
 
     @EventHandler

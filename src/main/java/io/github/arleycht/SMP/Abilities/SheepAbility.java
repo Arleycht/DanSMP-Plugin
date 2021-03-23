@@ -40,8 +40,8 @@ public class SheepAbility extends Ability {
     public static final int WOOL_GENERATION_MIN = 4;
     public static final int WOOL_GENERATION_MAX = 10;
 
-    private Cooldown generationCooldown = new Cooldown(25.0);
-    private Cooldown eatCooldown = new Cooldown(5.0);
+    private final Cooldown generationCooldown = new Cooldown(25.0);
+    private final Cooldown eatCooldown = new Cooldown(5.0);
 
     private boolean nutritionAvailable = false;
 

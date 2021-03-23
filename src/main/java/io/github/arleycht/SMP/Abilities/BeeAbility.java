@@ -26,8 +26,8 @@ public class BeeAbility extends Ability {
     public static final int BEE_DELAY_MAX = 10;
     public static final int BEE_DURATION_TICKS = 10 * 20;
 
-    private Cooldown BEE_COOLDOWN = new Cooldown(30.0);
-    private Cooldown HONEY_BOTTLE_GENERATION_COOLDOWN = new Cooldown(10.0 * 60.0 * 60.0);
+    private final Cooldown BEE_COOLDOWN = new Cooldown(30.0);
+    private final Cooldown HONEY_BOTTLE_GENERATION_COOLDOWN = new Cooldown(10.0 * 60.0 * 60.0);
 
     @Override
     public void initialize() {

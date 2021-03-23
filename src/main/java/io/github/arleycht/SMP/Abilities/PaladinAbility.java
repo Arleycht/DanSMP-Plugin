@@ -20,7 +20,7 @@ public class PaladinAbility extends Ability {
 
     public static final ArrayList<PotionEffect> EFFECT_LIST = new ArrayList<>();
 
-    private Cooldown abilityCooldown = new Cooldown(60.0);
+    private final Cooldown abilityCooldown = new Cooldown(60.0);
 
     static {
         addEffect(PotionEffectType.REGENERATION, 0, 15);

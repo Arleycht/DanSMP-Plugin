@@ -39,7 +39,7 @@ public class WyvernAbility extends Ability {
             "{0} died as they begged the question"
     };
 
-    private Cooldown fireballCooldown = new Cooldown(15.0);
+    private final Cooldown fireballCooldown = new Cooldown(15.0);
 
     private BukkitTask rainDamageTask = null;
     private BukkitTask submergeDamageTask = null;
@@ -106,6 +106,10 @@ public class WyvernAbility extends Ability {
 
                 World world = event.getWorld();
                 Location location = player.getLocation();
+
+                if (world.getEnvironment() != World.Environment.NORMAL) {
+                    return;
+                }
 
                 int x = (int) location.getX();
                 int z = (int) location.getZ();

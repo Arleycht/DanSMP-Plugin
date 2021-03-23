@@ -79,7 +79,7 @@ public class CupidAbility extends Ability {
         ItemStack heldItem = event.getItem();
 
         if (isOwner(player) && heldItem.getType() == Material.HONEY_BOTTLE) {
-
+            // Turn into a bee :)
         }
     }
 

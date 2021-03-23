@@ -207,7 +207,7 @@ public class WyvernAbility extends Ability {
         ItemStack itemStack = event.getItem();
 
         if (isOwner(player) && itemStack.getType() == Material.POTION) {
-
+            // TODO: Die when drinking water bottle
         }
     }
 

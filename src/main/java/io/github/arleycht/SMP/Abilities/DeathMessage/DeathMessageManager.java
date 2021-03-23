@@ -1,7 +1,7 @@
 package io.github.arleycht.SMP.Abilities.DeathMessage;
 
 import io.github.arleycht.SMP.Abilities.Ability;
-import javafx.util.Pair;
+import io.github.arleycht.SMP.util.Pair;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,6 +17,7 @@ public final class DeathMessageManager implements Listener {
     private static final DeathMessageManager INSTANCE;
 
     private static final HashMap<Ability, List<String>> REGISTERED_MESSAGES = new HashMap<>();
+
     private static final HashMap<UUID, Pair<Ability, Long>> NEXT_MESSAGES = new HashMap<>();
 
     private static final Random RANDOM = new Random();

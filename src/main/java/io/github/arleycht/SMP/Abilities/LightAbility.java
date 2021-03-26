@@ -80,7 +80,7 @@ public class LightAbility extends Ability {
             return;
         }
 
-        active = Math.floorMod(world.getTime() - BEGIN_TIME, 24000L) < ACTIVE_INTERVAL_TIME;
+        active = (world.getTime() - BEGIN_TIME % 24000L) + 24000L < ACTIVE_INTERVAL_TIME;
     }
 
     @EventHandler

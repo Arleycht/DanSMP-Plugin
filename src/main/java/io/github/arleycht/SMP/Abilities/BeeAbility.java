@@ -14,6 +14,8 @@ import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -23,7 +25,7 @@ public class BeeAbility extends Ability {
 
     public static final int BEE_COUNT_MIN = 8;
     public static final int BEE_COUNT_MAX = 12;
-    public static final int BEE_DELAY_MAX = 10;
+    public static final int BEE_DELAY_MAX = 20;
     public static final int BEE_DURATION_TICKS = 10 * 20;
 
     private final Cooldown BEE_COOLDOWN = new Cooldown(30.0);
@@ -67,8 +69,12 @@ public class BeeAbility extends Ability {
         Entity entity = event.getEntity();
         Entity target = event.getTarget();
 
-        if (entity instanceof Bee && isOwner(target)) {
+        if (isOwner(target) && entity instanceof Bee) {
             Bee bee = (Bee) entity;
+
+            if (bee.getAnger() < 1) {
+                return;
+            }
 
             bee.setTarget(null);
 
@@ -111,7 +117,23 @@ public class BeeAbility extends Ability {
                 }, rng.nextInt(BEE_DELAY_MAX));
             }
 
+            BukkitTask beeTask = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+                Vector diff, target, offset;
+
+                for (Bee bee : bees) {
+                    offset = new Vector(rng.nextFloat(), attacker.getEyeHeight() / 2, rng.nextFloat());
+                    target = attacker.getLocation().toVector().add(offset);
+                    diff = target.subtract(bee.getLocation().toVector());
+
+                    bee.setTarget(attacker);
+                    bee.setVelocity(diff.normalize().multiply(0.5f));
+                    bee.setHasStung(false);
+                }
+            }, 0, 5);
+
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                beeTask.cancel();
+
                 PotionEffect witherEffect = new PotionEffect(PotionEffectType.WITHER, Integer.MAX_VALUE, 1, false, false);
 
                 for (Bee bee : bees) {

@@ -3,9 +3,10 @@ package io.github.arleycht.SMP;
 import io.github.arleycht.SMP.Abilities.*;
 import io.github.arleycht.SMP.Abilities.DeathMessage.DeathMessageManager;
 import io.github.arleycht.SMP.Characters.ActorRegistry;
-import io.github.arleycht.SMP.Commands.SMPTabCompleter;
 import io.github.arleycht.SMP.Commands.SMPCommandExecutor;
+import io.github.arleycht.SMP.Commands.SMPTabCompleter;
 import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -43,6 +44,7 @@ public class DanSMP extends JavaPlugin {
     }
 
     private void initializeConfiguration() {
+        // TODO
         saveDefaultConfig();
     }
 
@@ -132,7 +134,7 @@ public class DanSMP extends JavaPlugin {
     private void registerCommand(String command, CommandExecutor executor, TabCompleter tabCompleter) {
         if (command == null) {
             String msg = "Attempted to register a null command to executor of class '%s'!";
-            getLogger().severe(String.format(msg, String.valueOf(executor.getClass())));
+            getLogger().severe(String.format(msg, executor.getClass()));
 
             return;
         } else if (executor == null) {
@@ -142,8 +144,17 @@ public class DanSMP extends JavaPlugin {
             return;
         }
 
-        this.getCommand(command).setExecutor(executor);
-        this.getCommand(command).setTabCompleter(tabCompleter);
+        PluginCommand pluginCommand = this.getCommand(command);
+
+        if (pluginCommand == null) {
+            String msg = "Command '%s' was not found! Maybe it is missing from plugin.yml?";
+            getLogger().severe(String.format(msg, command));
+
+            return;
+        }
+
+        pluginCommand.setExecutor(executor);
+        pluginCommand.setTabCompleter(tabCompleter);
 
         getLogger().info(String.format("Registered command '%s'", command));
     }

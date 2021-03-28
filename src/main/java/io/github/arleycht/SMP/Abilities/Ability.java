@@ -6,6 +6,7 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,7 +39,7 @@ public abstract class Ability implements Listener, Runnable {
 
     }
 
-    public boolean isOwner(UUID uuid) {
+    public boolean isOwner(@Nullable UUID uuid) {
         if (uuid == null) {
             return false;
         }
@@ -46,7 +47,7 @@ public abstract class Ability implements Listener, Runnable {
         return uuid.equals(owner.getUniqueId());
     }
 
-    public boolean isOwner(Entity entity) {
+    public boolean isOwner(@Nullable Entity entity) {
         if (entity == null) {
             return false;
         }

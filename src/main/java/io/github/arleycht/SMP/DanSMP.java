@@ -3,8 +3,10 @@ package io.github.arleycht.SMP;
 import io.github.arleycht.SMP.Abilities.*;
 import io.github.arleycht.SMP.Abilities.DeathMessage.DeathMessageManager;
 import io.github.arleycht.SMP.Characters.ActorRegistry;
+import io.github.arleycht.SMP.Commands.SMPTabCompleter;
 import io.github.arleycht.SMP.Commands.SMPCommandExecutor;
 import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class DanSMP extends JavaPlugin {
@@ -45,7 +47,7 @@ public class DanSMP extends JavaPlugin {
     }
 
     private void initializeCommands() {
-        registerCommand(SMPCommandExecutor.COMMAND_NAME, new SMPCommandExecutor());
+        registerCommand(SMPCommandExecutor.COMMAND_NAME, new SMPCommandExecutor(), new SMPTabCompleter());
     }
 
     private void initializeCharacters() {
@@ -127,7 +129,7 @@ public class DanSMP extends JavaPlugin {
         AbilityRegistry.registerAbility("Angela", WyvernAbility.class, this);
     }
 
-    private void registerCommand(String command, CommandExecutor executor) {
+    private void registerCommand(String command, CommandExecutor executor, TabCompleter tabCompleter) {
         if (command == null) {
             String msg = "Attempted to register a null command to executor of class '%s'!";
             getLogger().severe(String.format(msg, String.valueOf(executor.getClass())));
@@ -141,6 +143,7 @@ public class DanSMP extends JavaPlugin {
         }
 
         this.getCommand(command).setExecutor(executor);
+        this.getCommand(command).setTabCompleter(tabCompleter);
 
         getLogger().info(String.format("Registered command '%s'", command));
     }

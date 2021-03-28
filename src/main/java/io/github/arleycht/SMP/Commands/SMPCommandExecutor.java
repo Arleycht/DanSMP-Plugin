@@ -1,9 +1,9 @@
 package io.github.arleycht.SMP.Commands;
 
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 public class SMPCommandExecutor implements CommandExecutor {
@@ -23,17 +23,16 @@ public class SMPCommandExecutor implements CommandExecutor {
             return false;
         }
 
-        for (String arg : args) {
-            System.out.println(arg);
-        }
-
         switch (args[0].toLowerCase()) {
-            case "funny":
-                String msg = "%s used the funny command!\nPlease laugh.";
+            case "eject":
+                // Quick fix for some people who experience a server-client desync where passengers become stuck on
+                // their vehicles (horses, specifically) even after relogging.
 
-                Bukkit.broadcastMessage(String.format(msg, player.getName()));
-                player.chat(":^)");
-                player.setHealth(0.0);
+                Entity vehicle = player.getVehicle();
+
+                if (vehicle != null) {
+                    vehicle.eject();
+                }
 
                 return true;
             default:

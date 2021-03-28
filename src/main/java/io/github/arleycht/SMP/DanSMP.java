@@ -70,6 +70,7 @@ public class DanSMP extends JavaPlugin {
 
         ActorRegistry.addActor("Isaias", "ca8073ee-0901-4e99-a7cb-7a0b70af361e");
 
+        ActorRegistry.addActor("Jeff", "8f67331d-2036-4e6f-9df5-c56497eed54a");
         ActorRegistry.addActor("Justin", "125aae72-7853-4af0-9761-d5d2dfbf1540");
 
         ActorRegistry.addActor("Kai-Lan", "b908eef4-afb4-4010-b825-c0703ecf87e3");
@@ -93,17 +94,16 @@ public class DanSMP extends JavaPlugin {
         // People whose names aren't known
 
         ActorRegistry.addActor("Brother1n4rms", "2a24765c-448c-4193-a254-fa9614a534d2");
+        ActorRegistry.addActor("TacoSword", "86a4b33d-b8ed-46fc-9997-eea75ae2e946");
+
+        // People who are not active on the server
+
         ActorRegistry.addActor("lil_gloomi", "8987b1c1-6726-46bb-a465-be0e1c9cf19e");
         ActorRegistry.addActor("MuyJugoso", "cf719917-ff6a-4606-80a7-32ab512ea10c");
         ActorRegistry.addActor("per_seph_one", "1a615087-022b-4474-8956-0c826f10e018");
         ActorRegistry.addActor("philly4321", "e7ac59d2-68ec-4474-810b-662602f78c2a");
         ActorRegistry.addActor("Sonacrownguard", "c4138cb6-1701-4550-8263-5217485c8e4d");
-        ActorRegistry.addActor("TacoSword", "86a4b33d-b8ed-46fc-9997-eea75ae2e946");
-
-        // Misc
-
-        ActorRegistry.addActor("Jeff", "8f67331d-2036-4e6f-9df5-c56497eed54a");
-        ActorRegistry.addActor("Brandon", "ee6846d1-dcae-416e-8e9a-b944cb60777e");
+        ActorRegistry.addActor("YungWaffleFry", "ee6846d1-dcae-416e-8e9a-b944cb60777e");
 
         getLogger().info("DanSMP finished initialization!");
     }

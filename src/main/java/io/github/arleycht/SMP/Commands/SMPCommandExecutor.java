@@ -5,12 +5,13 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public class SMPCommandExecutor implements CommandExecutor {
     public static final String COMMAND_NAME = "dansmp";
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, String label, String[] args) {
         Player player;
 
         if (!label.equalsIgnoreCase(COMMAND_NAME)) {

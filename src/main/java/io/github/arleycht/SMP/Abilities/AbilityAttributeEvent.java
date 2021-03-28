@@ -3,15 +3,16 @@ package io.github.arleycht.SMP.Abilities;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 
 public class AbilityAttributeEvent extends Event {
     private final Player player;
 
-    public AbilityAttributeEvent(Player player) {
+    public AbilityAttributeEvent(@NotNull Player player) {
         this.player = player;
     }
 
-    public Player getPlayer() {
+    public @NotNull Player getPlayer() {
         return player;
     }
 
@@ -24,7 +25,7 @@ public class AbilityAttributeEvent extends Event {
     }
 
     @Override
-    public HandlerList getHandlers() {
+    public @NotNull HandlerList getHandlers() {
         return HANDLERS;
     }
 }

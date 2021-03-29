@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Bee;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -28,8 +29,8 @@ public class BeeAbility extends Ability {
     public static final int BEE_DELAY_MAX = 20;
     public static final int BEE_DURATION_TICKS = 10 * 20;
 
-    private final Cooldown BEE_COOLDOWN = new Cooldown(30.0);
-    private final Cooldown HONEY_BOTTLE_GENERATION_COOLDOWN = new Cooldown(10.0 * 60.0 * 60.0);
+    private final Cooldown BEE_COOLDOWN = new Cooldown(45.0);
+    private final Cooldown HONEY_BOTTLE_GENERATION_COOLDOWN = new Cooldown(10.0 * 60.0);
 
     @Override
     public void initialize() {
@@ -87,8 +88,8 @@ public class BeeAbility extends Ability {
         Entity damager = event.getDamager();
         Entity entity = event.getEntity();
 
-        if (isOwner(entity) && (damager instanceof Player)) {
-            Player attacker = (Player) damager;
+        if (isOwner(entity) && (damager instanceof LivingEntity)) {
+            LivingEntity attacker = (LivingEntity) damager;
             Player victim = (Player) entity;
 
             if (BEE_COOLDOWN.isNotReady()) {

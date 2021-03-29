@@ -1,6 +1,4 @@
-package io.github.arleycht.SMP;
-
-import io.github.arleycht.SMP.Abilities.Ability;
+package io.github.arleycht.SMP.Abilities;
 
 public class OverdriveAbility extends Ability {
     // TODO: Speed, Damage, Haste, True Damage

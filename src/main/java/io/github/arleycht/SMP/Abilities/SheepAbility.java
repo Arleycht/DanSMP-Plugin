@@ -7,6 +7,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Wolf;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -120,6 +121,10 @@ public class SheepAbility extends Ability {
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         World world = player.getWorld();
+
+        if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) {
+            return;
+        }
 
         if (isOwner(player) && player.isSneaking()) {
             long currentTime = System.currentTimeMillis();

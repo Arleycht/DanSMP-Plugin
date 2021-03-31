@@ -24,7 +24,7 @@ public class SheepAbility extends Ability {
     public static final double WOLF_AGGRO_RANGE = 15.0;
 
     public static final int FOOD_LEVEL_INCREMENT = 1;
-    public static final float SATURATION_LEVEL_INCREMENT = 0.25f;
+    public static final float SATURATION_LEVEL_INCREMENT = 0.6f;
 
     public static final Material[] VEGETARIAN_UNFRIENDLY = {
             Material.COD, Material.COOKED_COD,

@@ -20,14 +20,10 @@ public class DarkAbility extends Ability {
 
     public static final long BEGIN_TIME = 10800L;
     public static final long END_TIME = 1200L;
-    public static final long ACTIVE_INTERVAL_TIME = Math.abs(END_TIME - BEGIN_TIME);
 
     public static final double DAMAGE_MULTIPLIER = 2.0;
 
-    public static final String ACTIVE_MESSAGE = "You feel the moon begin to rise";
-    public static final String INACTIVE_MESSAGE = "You feel the moon begin to set";
-
-    private final Cooldown checkCooldown = new Cooldown(1.0);
+    private final Cooldown checkCooldown = new Cooldown(5.0);
 
     private boolean active = false;
 
@@ -51,6 +47,29 @@ public class DarkAbility extends Ability {
 
         World world = player.getWorld();
 
+        if (checkCooldown.isReady()) {
+            checkCooldown.reset();
+
+            active = false;
+
+            if (world.getEnvironment() == World.Environment.NORMAL) {
+                long congruence = (world.getTime() - BEGIN_TIME) % 24000;
+
+                // Java n % m returns in range (-m, m)
+                if (congruence < 0) {
+                    congruence += 24000;
+                }
+
+                // Ignore any warnings stating this is always true/false
+                // This condition is for interpretability
+                if (BEGIN_TIME < END_TIME) {
+                    active = BEGIN_TIME < congruence && congruence < END_TIME;
+                } else {
+                    active = END_TIME < congruence && congruence < BEGIN_TIME;
+                }
+            }
+        }
+
         if (active && player.getPotionEffect(PotionEffectType.INVISIBILITY) == null) {
             Location location = player.getLocation();
 
@@ -69,18 +88,6 @@ public class DarkAbility extends Ability {
 
             world.spawnParticle(Particle.REDSTONE, location, 3, data);
         }
-
-        if (checkCooldown.isNotReady()) {
-            return;
-        }
-
-        checkCooldown.reset();
-
-        if (world.getEnvironment() != World.Environment.NORMAL) {
-            return;
-        }
-
-        active = (world.getTime() - BEGIN_TIME % 24000L) + 24000L < ACTIVE_INTERVAL_TIME;
     }
 
     @EventHandler

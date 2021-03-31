@@ -20,6 +20,7 @@ public class DarkAbility extends Ability {
 
     public static final long BEGIN_TIME = 10800L;
     public static final long END_TIME = 1200L;
+    public static final long INTERVAL_DURATION = Math.floorMod(END_TIME - BEGIN_TIME, 24000);
 
     public static final double DAMAGE_MULTIPLIER = 2.0;
 
@@ -53,20 +54,7 @@ public class DarkAbility extends Ability {
             active = false;
 
             if (world.getEnvironment() == World.Environment.NORMAL) {
-                long congruence = (world.getTime() - BEGIN_TIME) % 24000;
-
-                // Java n % m returns in range (-m, m)
-                if (congruence < 0) {
-                    congruence += 24000;
-                }
-
-                // Ignore any warnings stating this is always true/false
-                // This condition is for interpretability
-                if (BEGIN_TIME < END_TIME) {
-                    active = BEGIN_TIME < congruence && congruence < END_TIME;
-                } else {
-                    active = END_TIME < congruence && congruence < BEGIN_TIME;
-                }
+                active = Math.floorMod(world.getTime() - BEGIN_TIME, 24000) < INTERVAL_DURATION;
             }
         }
 

@@ -4,3 +4,8 @@
 # Requirements
 
 [ProtocolLib 4.6.0](https://github.com/dmulloy2/ProtocolLib/releases/tag/4.6.0)
+
+# Copyright
+
+Arleycht 2021
+All rights reserved.

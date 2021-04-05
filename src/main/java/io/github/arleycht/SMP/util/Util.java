@@ -34,7 +34,7 @@ public class Util {
         return !leftovers.isEmpty();
     }
 
-    public static void applyEffect(Player player, PotionEffectType effectType, float durationSeconds, int amplifier, boolean ambient, boolean hideParticles, boolean icon) {
+    public static void applyEffect(@NotNull Player player, @NotNull PotionEffectType effectType, float durationSeconds, int amplifier, boolean ambient, boolean hideParticles, boolean icon) {
         PotionEffect effect = new PotionEffect(effectType, (int) (durationSeconds * 20), amplifier, ambient, hideParticles, icon);
 
         player.addPotionEffect(effect);

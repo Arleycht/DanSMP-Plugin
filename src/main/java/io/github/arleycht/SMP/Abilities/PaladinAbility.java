@@ -114,7 +114,7 @@ public class PaladinAbility extends Ability {
         float finalCost = playersBuffedCount * FOOD_COST_PER_PLAYER;
         float newFoodLevel = player.getFoodLevel() - finalCost;
 
-        if (newFoodLevel >= 0) {
+        if (newFoodLevel > 0.0f) {
             // Round up because we're nice like that
             player.setFoodLevel((int) (newFoodLevel + 0.5f));
         } else {

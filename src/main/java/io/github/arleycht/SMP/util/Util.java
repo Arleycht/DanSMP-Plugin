@@ -34,8 +34,14 @@ public class Util {
         return !leftovers.isEmpty();
     }
 
-    public static void applyEffect(@NotNull Player player, @NotNull PotionEffectType effectType, float durationSeconds, int amplifier, boolean ambient, boolean hideParticles, boolean icon) {
-        PotionEffect effect = new PotionEffect(effectType, (int) (durationSeconds * 20), amplifier, ambient, hideParticles, icon);
+    public static void applyEffect(@NotNull Player player, @NotNull PotionEffectType effectType, float durationSeconds, int amplifier) {
+        PotionEffect effect = new PotionEffect(effectType, (int) (durationSeconds * 20), amplifier, false, true, true);
+
+        player.addPotionEffect(effect);
+    }
+
+    public static void applyEffect(@NotNull Player player, @NotNull PotionEffectType effectType, float durationSeconds, int amplifier, boolean ambient, boolean particles, boolean icon) {
+        PotionEffect effect = new PotionEffect(effectType, (int) (durationSeconds * 20), amplifier, ambient, particles, icon);
 
         player.addPotionEffect(effect);
     }

@@ -1,16 +1,16 @@
 package io.github.arleycht.SMP.util;
 
 public class Cooldown {
-    private final long duration;
+    private final long durationMilliseconds;
 
     private long cooldownEndTime;
 
     public Cooldown(double seconds) {
-        duration = (long) (seconds * 1000.0);
+        durationMilliseconds = (long) (seconds * 1000.0);
     }
 
     public void reset() {
-        cooldownEndTime = System.currentTimeMillis() + duration;
+        cooldownEndTime = System.currentTimeMillis() + durationMilliseconds;
     }
 
     public boolean isNotReady() {
@@ -21,7 +21,7 @@ public class Cooldown {
         return !isNotReady();
     }
 
-    public double getDuration() {
-        return duration / 1000.0;
+    public double getDurationMilliseconds() {
+        return durationMilliseconds / 1000.0;
     }
 }

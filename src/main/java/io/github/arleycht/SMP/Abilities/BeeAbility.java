@@ -78,14 +78,14 @@ public class BeeAbility extends Ability {
 
             velocity.add(new Vector(0.0, 1.0 - velocity.getY(), 0.0));
 
-            Util.applyEffect(player, PotionEffectType.LEVITATION, 3.0f, 0, false, true, false);
+            Util.applyEffect(player, PotionEffectType.LEVITATION, 3.0f, 0, false, false, false);
             player.setVelocity(velocity);
 
             world.playSound(player.getLocation(), Sound.ENTITY_BEE_LOOP, 1.0f, 1.0f);
 
             Bukkit.getScheduler().runTaskLater(getPlugin(),
-                    () -> Util.applyEffect(player, PotionEffectType.SLOW_FALLING, 6.0f, 0, false, true, false),
-                    (long) (3.0f * 20.0f));
+                    () -> Util.applyEffect(player, PotionEffectType.SLOW_FALLING, 6.0f, 0, false, false, false),
+                    3L * 20L);
         }
     }
 

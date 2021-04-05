@@ -29,7 +29,7 @@ public class BeeAbility extends Ability {
     public static final int BEE_DURATION_TICKS = 10 * 20;
 
     private final Cooldown BEE_COOLDOWN = new Cooldown(45.0);
-    private final Cooldown HONEY_BOTTLE_GENERATION_COOLDOWN = new Cooldown(2.0 * 60.0);
+    private final Cooldown HONEY_BOTTLE_GENERATION_COOLDOWN = new Cooldown(3.0 * 60.0);
     private final Cooldown ABILITY_COOLDOWN = new Cooldown(10.0);
 
     @EventHandler

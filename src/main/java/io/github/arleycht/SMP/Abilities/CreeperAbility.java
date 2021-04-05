@@ -9,6 +9,7 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import io.github.arleycht.SMP.Abilities.DeathMessage.DeathMessageManager;
 import io.github.arleycht.SMP.util.Cooldown;
+import io.github.arleycht.SMP.util.Util;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -32,15 +33,15 @@ public class CreeperAbility extends Ability {
             "{0} went boom"
     };
 
-    private final Cooldown generationCooldown = new Cooldown(60 * 20);
+    private final Cooldown GENERATION_COOLDOWN = new Cooldown(20.0 * 60.0);
 
     private PacketAdapter packetAdapter;
 
     @Override
     public void initialize() {
-        DeathMessageManager.setDeathMessages(this, ABILITY_DEATH_MESSAGES);
+        GENERATION_COOLDOWN.reset();
 
-        generationCooldown.reset();
+        DeathMessageManager.setDeathMessages(this, ABILITY_DEATH_MESSAGES);
 
         if (packetAdapter != null) {
             ProtocolLibrary.getProtocolManager().removePacketListener(packetAdapter);
@@ -106,7 +107,7 @@ public class CreeperAbility extends Ability {
 
     @Override
     public void run() {
-        if (generationCooldown.isNotReady()) {
+        if (GENERATION_COOLDOWN.isNotReady()) {
             return;
         }
 
@@ -116,10 +117,9 @@ public class CreeperAbility extends Ability {
             return;
         }
 
-        ItemStack gunpowder = new ItemStack(Material.GUNPOWDER);
-        player.getInventory().addItem(gunpowder);
+        Util.giveItem(player, Material.GUNPOWDER, 1);
 
-        generationCooldown.reset();
+        GENERATION_COOLDOWN.reset();
     }
 
     @EventHandler

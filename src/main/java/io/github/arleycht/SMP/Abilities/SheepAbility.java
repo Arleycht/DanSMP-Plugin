@@ -41,8 +41,8 @@ public class SheepAbility extends Ability {
     public static final int WOOL_GENERATION_MIN = 4;
     public static final int WOOL_GENERATION_MAX = 10;
 
-    private final Cooldown generationCooldown = new Cooldown(25.0);
-    private final Cooldown eatCooldown = new Cooldown(5.0);
+    private final Cooldown GENERATION_COOLDOWN = new Cooldown(25.0);
+    private final Cooldown EAT_COOLDOWN = new Cooldown(5.0);
 
     private boolean nutritionAvailable = false;
 
@@ -134,8 +134,8 @@ public class SheepAbility extends Ability {
                 ItemStack heldItem = inventory.getItem(EquipmentSlot.HAND);
 
                 if (heldItem.getType() == Material.SHEARS) {
-                    if (generationCooldown.isReady()) {
-                        generationCooldown.reset();
+                    if (GENERATION_COOLDOWN.isReady()) {
+                        GENERATION_COOLDOWN.reset();
 
                         nutritionAvailable = false;
 
@@ -152,12 +152,12 @@ public class SheepAbility extends Ability {
                 }
             }
 
-            if (eatCooldown.isReady()) {
+            if (EAT_COOLDOWN.isReady()) {
                 Block block = event.getClickedBlock();
                 Material conversionType = getConversionType(block);
 
                 if (block != null && conversionType != null) {
-                    eatCooldown.reset();
+                    EAT_COOLDOWN.reset();
 
                     nutritionAvailable = true;
 

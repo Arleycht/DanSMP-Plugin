@@ -62,7 +62,7 @@ public class FortressAbility extends Ability {
             ABILITY_COOLDOWN.reset();
 
             Util.applyEffect(player, PotionEffectType.DAMAGE_RESISTANCE, 25.0f, 0);
-            Util.applyEffect(player, PotionEffectType.GLOWING, 15.0f, 0, false, false, false);
+            Util.applyEffect(player, PotionEffectType.GLOWING, 25.0f, 0, false, false, false);
 
             world.playSound(player.getLocation(), Sound.ENTITY_IRON_GOLEM_HURT, 1.0f, 0.25f);
         }

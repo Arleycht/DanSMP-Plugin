@@ -112,17 +112,17 @@ public class PaladinAbility extends Ability {
         // Decrement food level according to amount of players buffed, and take from saturation if necessary
 
         float finalCost = playersBuffedCount * FOOD_COST_PER_PLAYER;
-        float remainder = finalCost - player.getFoodLevel();
+        float newFoodLevel = player.getFoodLevel() - finalCost;
 
-        if (remainder > 0) {
+        if (newFoodLevel >= 0) {
             // Round up because we're nice like that
-            player.setFoodLevel((int) (remainder + 0.5f));
+            player.setFoodLevel((int) (newFoodLevel + 0.5f));
         } else {
             // Take from saturation
-            remainder = Math.max(0.0f, player.getSaturation() + remainder);
+            float saturation = Math.max(0.0f, player.getSaturation() + newFoodLevel);
 
             player.setFoodLevel(0);
-            player.setSaturation(remainder);
+            player.setSaturation(saturation);
         }
     }
 

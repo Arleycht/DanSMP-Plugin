@@ -1,17 +1,18 @@
 package io.github.arleycht.SMP.Abilities;
 
 import io.github.arleycht.SMP.util.Cooldown;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import io.github.arleycht.SMP.util.Util;
+import org.bukkit.*;
 import org.bukkit.entity.Bee;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -22,47 +23,70 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class BeeAbility extends Ability {
-    public static final long TASK_INTERVAL_TICKS = 20L;
-
     public static final int BEE_COUNT_MIN = 8;
     public static final int BEE_COUNT_MAX = 12;
     public static final int BEE_DELAY_MAX = 20;
     public static final int BEE_DURATION_TICKS = 10 * 20;
 
     private final Cooldown BEE_COOLDOWN = new Cooldown(45.0);
-    private final Cooldown HONEY_BOTTLE_GENERATION_COOLDOWN = new Cooldown(10.0 * 60.0);
+    private final Cooldown HONEY_BOTTLE_GENERATION_COOLDOWN = new Cooldown(2.0 * 60.0);
+    private final Cooldown ABILITY_COOLDOWN = new Cooldown(10.0);
 
-    @Override
-    public void initialize() {
-        HONEY_BOTTLE_GENERATION_COOLDOWN.reset();
-    }
+    @EventHandler
+    public void onPlayerInteractEvent(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
 
-    @Override
-    public boolean isRunnable() {
-        return true;
-    }
-
-    @Override
-    public long getTaskIntervalTicks() {
-        return TASK_INTERVAL_TICKS;
-    }
-
-    @Override
-    public void run() {
-        if (HONEY_BOTTLE_GENERATION_COOLDOWN.isNotReady()) {
+        if (!isOwner(player)) {
             return;
         }
 
-        Player player = owner.getPlayer();
-
-        if (player == null) {
+        if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) {
             return;
         }
 
-        ItemStack honeyBottle = new ItemStack(Material.HONEY_BOTTLE);
-        player.getInventory().addItem(honeyBottle);
+        if (event.getHand() != EquipmentSlot.HAND) {
+            return;
+        }
 
-        HONEY_BOTTLE_GENERATION_COOLDOWN.reset();
+        ItemStack heldItem = player.getInventory().getItem(EquipmentSlot.HAND);
+
+        World world = player.getWorld();
+
+        if (heldItem.getType() == Material.GLASS_BOTTLE) {
+            if (!player.isSneaking()) {
+                return;
+            }
+
+            if (HONEY_BOTTLE_GENERATION_COOLDOWN.isNotReady()) {
+                return;
+            }
+
+            HONEY_BOTTLE_GENERATION_COOLDOWN.reset();
+
+            heldItem.setAmount(heldItem.getAmount() - 1);
+            Util.giveItem(player, Material.HONEY_BOTTLE, 1);
+
+            world.playSound(player.getLocation(), Sound.ITEM_HONEY_BOTTLE_DRINK, 1.0f, 1.0f);
+        } else if (heldItem.getType() == Material.HONEYCOMB) {
+            if (ABILITY_COOLDOWN.isNotReady()) {
+                return;
+            }
+
+            ABILITY_COOLDOWN.reset();
+
+            Vector velocity = player.getVelocity();
+
+            velocity.add(new Vector(0.0, 1.0 - velocity.getY(), 0.0));
+
+            Util.applyEffect(player, PotionEffectType.LEVITATION, 3.0f, 0, false, true, false);
+            player.setVelocity(velocity);
+
+            world.playSound(player.getLocation(), Sound.ENTITY_BEE_LOOP, 1.0f, 1.0f);
+
+            Bukkit.getScheduler().runTaskLater(getPlugin(),
+                    () -> Util.applyEffect(player, PotionEffectType.SLOW_FALLING, 6.0f, 0, false, true, false),
+                    (long) (3.0f * 20.0f));
+        }
     }
 
     @EventHandler

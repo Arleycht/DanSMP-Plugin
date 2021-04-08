@@ -12,6 +12,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -24,6 +25,7 @@ import java.text.MessageFormat;
 
 public class OverdriveAbility extends Ability {
     public static final int MAX_POWER = 10;
+    public static final long TRUE_DAMAGE_DURATION_TICKS = 10L * 20L;
     public static final String[] ABILITY_DEATH_MESSAGES = {
             "{0} burnt out their servos",
             "{0} released the magic smoke",
@@ -33,7 +35,7 @@ public class OverdriveAbility extends Ability {
 
     private final Cooldown SELECT_COOLDOWN = new Cooldown(0.1);
     private final Cooldown ABILITY_COOLDOWN = new Cooldown(5.0);
-    private final Cooldown TRUE_DAMAGE_COOLDOWN = new Cooldown(10.0);
+    private final Cooldown TRUE_DAMAGE_COOLDOWN = new Cooldown(30.0);
 
     private boolean trueDamageActive = false;
     private BukkitTask trueDamageTickTask = null;
@@ -50,6 +52,10 @@ public class OverdriveAbility extends Ability {
         Player player = event.getPlayer();
 
         if (!isOwner(player)) {
+            return;
+        }
+
+        if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) {
             return;
         }
 
@@ -116,10 +122,10 @@ public class OverdriveAbility extends Ability {
                 Bukkit.getScheduler().runTaskLater(getPlugin(), () -> {
                     trueDamageActive = false;
                     trueDamageTickTask.cancel();
-                }, TRUE_DAMAGE_COOLDOWN.getDurationTicks());
+                }, TRUE_DAMAGE_DURATION_TICKS);
 
                 effectType = PotionEffectType.GLOWING;
-                duration = (float) TRUE_DAMAGE_COOLDOWN.getDurationSeconds();
+                duration = TRUE_DAMAGE_DURATION_TICKS / 20.0f;
 
                 break;
             case MUSIC_DISC_BLOCKS:

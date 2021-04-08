@@ -21,7 +21,11 @@ public class Cooldown {
         return !isNotReady();
     }
 
-    public double getDurationMilliseconds() {
+    public double getDurationSeconds() {
         return durationMilliseconds / 1000.0;
+    }
+
+    public long getDurationTicks() {
+        return (long) (durationMilliseconds * 20.0 / 1000.0);
     }
 }

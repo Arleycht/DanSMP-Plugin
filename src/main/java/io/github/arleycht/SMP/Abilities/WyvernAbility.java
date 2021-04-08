@@ -23,9 +23,9 @@ import org.bukkit.util.Vector;
 public class WyvernAbility extends Ability {
     public static final long TASK_INTERVAL_TICKS = 1L;
     public static final double RAIN_DAMAGE = 1.0;
-    public static final long RAIN_DAMAGE_INTERVAL_TICKS = 40L;
+    public static final long RAIN_DAMAGE_INTERVAL_TICKS = 20L;
     public static final double SUBMERGE_DAMAGE = 1.0;
-    public static final long SUBMERGE_DAMAGE_INTERVAL_TICKS = 40L;
+    public static final long SUBMERGE_DAMAGE_INTERVAL_TICKS = 20L;
 
     public static final EntityDamageEvent.DamageCause[] DAMAGE_CAUSE_IMMUNITIES = {
         EntityDamageEvent.DamageCause.FIRE,

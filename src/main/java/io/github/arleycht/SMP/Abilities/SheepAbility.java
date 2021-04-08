@@ -1,6 +1,7 @@
 package io.github.arleycht.SMP.Abilities;
 
 import io.github.arleycht.SMP.util.Cooldown;
+import io.github.arleycht.SMP.util.Util;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -141,9 +142,8 @@ public class SheepAbility extends Ability {
 
                         Random rng = new Random();
                         int amount = WOOL_GENERATION_MIN + rng.nextInt(WOOL_GENERATION_MAX - WOOL_GENERATION_MIN);
-                        ItemStack woolItem = new ItemStack(Material.WHITE_WOOL, amount);
 
-                        world.dropItem(player.getLocation(), woolItem);
+                        Util.giveItem(player, Material.WHITE_WOOL, amount);
 
                         world.playSound(player.getLocation(), Sound.ENTITY_SHEEP_SHEAR, 1.0f, 1.0f);
 

@@ -28,9 +28,11 @@ public class CreeperAbility extends Ability {
     public static final double ABILITY_SCARE_RANGE = 8.0;
     public static final long ABILITY_DELAY_SCARED_TICKS = 30L;
     public static final String[] ABILITY_DEATH_MESSAGES = {
-            "{0} blew up canonically",
-            "{0}'s insides became outsides",
-            "{0} went boom"
+            "{0} used Self Destruct!\nIt was super effective!",
+            "{0}\'s insides became outsides",
+            "{0} went boom",
+            "{0} had a short fuse",
+            "{0} perished in smoke and flames",
     };
 
     private final Cooldown GENERATION_COOLDOWN = new Cooldown(20.0 * 60.0);

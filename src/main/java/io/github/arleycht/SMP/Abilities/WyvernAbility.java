@@ -36,7 +36,9 @@ public class WyvernAbility extends Ability {
     public static final String[] DEATH_MESSAGES = {
             "{0} had their life extinguished by water",
             "{0} couldn't swim",
-            "{0} died as they begged the question"
+            "{0} died as they begged the question", // Water you doing : )
+            "{0} blubbed their last blub",
+            "{0} became fish food"
     };
 
     private final Cooldown fireballCooldown = new Cooldown(15.0);

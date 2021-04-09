@@ -134,25 +134,35 @@ public class Util {
     }
 
     public static void dealTrueDamage(Damageable damageable, double damage) {
-        if (damageable.getHealth() <= 0.0) {
+        if (damageable.isDead()) {
             return;
         }
 
         double newHealth = Math.max(0.0, damageable.getHealth() - damage);
 
-        damageable.setHealth(newHealth);
         damageable.damage(0.000001);
+
+        if (damageable.isDead()) {
+            newHealth = 0.0;
+        }
+
+        damageable.setHealth(newHealth);
     }
 
     public static void dealTrueDamage(Damageable damageable, double damage, Entity source) {
-        if (damageable.getHealth() <= 0.0) {
+        if (damageable.isDead()) {
             return;
         }
 
         double newHealth = Math.max(0.0, damageable.getHealth() - damage);
 
-        damageable.setHealth(newHealth);
         damageable.damage(0.000001, source);
+
+        if (damageable.isDead()) {
+            newHealth = 0.0;
+        }
+
+        damageable.setHealth(newHealth);
     }
 
     public static int nextIntRange(int min, int max) {

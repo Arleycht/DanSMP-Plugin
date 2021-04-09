@@ -18,9 +18,9 @@ import java.util.ArrayList;
 
 public class LightningAbility extends Ability {
     public static final double MAX_BOLT_RANGE = 24.0;
-    public static final double BOLT_DAMAGE = 10.0;
+    public static final double BOLT_DAMAGE = 1.5;
 
-    private final Cooldown ABILITY_COOLDOWN = new Cooldown(0.2);
+    private final Cooldown ABILITY_COOLDOWN = new Cooldown(1.5);
     private final Cooldown CHARGED_ABILITY_COOLDOWN = new Cooldown(30.0);
 
     @EventHandler
@@ -31,7 +31,7 @@ public class LightningAbility extends Ability {
             return;
         }
 
-        if (event.getAction() != Action.LEFT_CLICK_AIR) {
+        if (event.getAction() != Action.LEFT_CLICK_AIR || event.getAction() != Action.LEFT_CLICK_BLOCK) {
             return;
         }
 
@@ -45,9 +45,7 @@ public class LightningAbility extends Ability {
             return;
         }
 
-        // Activate ability
-
-        event.setCancelled(true);
+        // Get closest entity to look direction
 
         World world = player.getWorld();
         Location location = player.getEyeLocation();
@@ -55,7 +53,7 @@ public class LightningAbility extends Ability {
         Block targetBlock = player.getTargetBlock(null, 100);
         Location targetLocation = targetBlock.getLocation();
 
-        final double MAX_ABS_ANGLE = 5.0;
+        final double MAX_ABS_ANGLE = 10.0;
 
         Entity closestEntity = null;
         double closestAngle = Double.MAX_VALUE;
@@ -92,6 +90,8 @@ public class LightningAbility extends Ability {
         }
 
         ABILITY_COOLDOWN.reset();
+
+        event.setCancelled(true);
 
         Vector startPos = player.getEyeLocation().toVector();
         Vector endPos = victim.getLocation().toVector().add(new Vector(0.0, victim.getHeight() / 2.0, 0.0));

@@ -8,11 +8,11 @@ public class LongArmsAbility extends Ability {
 
     @Override
     public String getName() {
-        return "Walking Fortress";
+        return "Long Arms";
     }
 
     @Override
     public String getDescription() {
-        return "Increased base armor and knockback resistance at the cost of movement speed.";
+        return "Increased ";
     }
 }

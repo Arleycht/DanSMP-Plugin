@@ -39,7 +39,7 @@ public class WyvernAbility extends Ability {
             "{0} became fish food"
     };
 
-    private final Cooldown fireballCooldown = new Cooldown(15.0);
+    private final Cooldown ABILITY_COOLDOWN = new Cooldown(15.0);
 
     private BukkitTask waterDamageTask = null;
 
@@ -66,7 +66,7 @@ public class WyvernAbility extends Ability {
             return;
         }
 
-        if (!Util.isInRain(player) && !Util.isInWater(player)) {
+        if ((!Util.isInRain(player) && !Util.isInWater(player)) || player.isDead()) {
             Util.safeTaskCancel(waterDamageTask);
         } else if (Util.safeTaskIsCancelled(waterDamageTask)) {
             waterDamageTask = Bukkit.getScheduler().runTaskTimer(getPlugin(), () -> {
@@ -120,11 +120,11 @@ public class WyvernAbility extends Ability {
 
         // Activate ability
 
-        if (fireballCooldown.isNotReady()) {
+        if (ABILITY_COOLDOWN.isNotReady()) {
             return;
         }
 
-        fireballCooldown.reset();
+        ABILITY_COOLDOWN.reset();
 
         if (player.getGameMode() != GameMode.CREATIVE) {
             handItem.setAmount(handItem.getAmount() - 1);

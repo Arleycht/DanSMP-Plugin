@@ -71,6 +71,7 @@ public class DanSMP extends JavaPlugin {
         ActorRegistry.addActor("Chris", "5e454c3a-2eeb-4cea-b899-909c901ce41f");
 
         ActorRegistry.addActor("Daniel", "d0fc999c-c8c9-4962-a745-cbefdf8ef9c6");
+        ActorRegistry.addActor("Daryll", "47e4e7d9-afba-44d8-a14d-7d1fc2fa8a74");
 
         ActorRegistry.addActor("Isaias", "ca8073ee-0901-4e99-a7cb-7a0b70af361e");
 
@@ -132,6 +133,8 @@ public class DanSMP extends JavaPlugin {
         AbilityRegistry.registerAbility("Alfredo", CupidAbility.class, this);
         AbilityRegistry.registerAbility("Steven", OverdriveAbility.class, this);
         AbilityRegistry.registerAbility("Brother1n4rms", LongArmsAbility.class, this);
+        AbilityRegistry.registerAbility("Daryll", EndermanAbility.class, this);
+        AbilityRegistry.registerAbility("Reginald", PunchAbility.class, this);
     }
 
     private void registerCommand(String command, CommandExecutor executor, TabCompleter tabCompleter) {

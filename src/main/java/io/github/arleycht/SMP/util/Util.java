@@ -20,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class Util {
     /**
@@ -133,16 +134,42 @@ public class Util {
     }
 
     public static void dealTrueDamage(Damageable damageable, double damage) {
+        if (damageable.getHealth() <= 0.0) {
+            return;
+        }
+
         double newHealth = Math.max(0.0, damageable.getHealth() - damage);
 
         damageable.setHealth(newHealth);
-        damageable.damage(Double.MIN_VALUE);
+        damageable.damage(0.000001);
     }
 
     public static void dealTrueDamage(Damageable damageable, double damage, Entity source) {
+        if (damageable.getHealth() <= 0.0) {
+            return;
+        }
+
         double newHealth = Math.max(0.0, damageable.getHealth() - damage);
 
         damageable.setHealth(newHealth);
-        damageable.damage(Double.MIN_VALUE, source);
+        damageable.damage(0.000001, source);
+    }
+
+    public static int nextIntRange(int min, int max) {
+        assert(max >= min);
+
+        return min + ((new Random()).nextInt() * (max - min));
+    }
+
+    public static float nextFloatRange(float min, float max) {
+        assert(max >= min);
+
+        return min + ((new Random()).nextFloat() * (max - min));
+    }
+
+    public static double nextDoubleRange(double min, double max) {
+        assert(max >= min);
+
+        return min + ((new Random()).nextDouble() * (max - min));
     }
 }

@@ -2,8 +2,8 @@ package io.github.arleycht.SMP.Abilities;
 
 import io.github.arleycht.SMP.Abilities.DeathMessage.DeathMessageManager;
 import io.github.arleycht.SMP.util.Cooldown;
+import io.github.arleycht.SMP.util.Util;
 import org.bukkit.*;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
@@ -14,25 +14,23 @@ import org.bukkit.event.entity.EntityToggleGlideEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
-import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 public class WyvernAbility extends Ability {
-    public static final long TASK_INTERVAL_TICKS = 1L;
-    public static final double RAIN_DAMAGE = 1.0;
-    public static final long RAIN_DAMAGE_INTERVAL_TICKS = 20L;
-    public static final double SUBMERGE_DAMAGE = 1.0;
-    public static final long SUBMERGE_DAMAGE_INTERVAL_TICKS = 20L;
-
+    public static final long TASK_INTERVAL_TICKS = 20L;
+    public static final double WATER_DAMAGE = 1.0;
+    public static final long WATER_DAMAGE_INTERVAL_TICKS = 10L;
     public static final EntityDamageEvent.DamageCause[] DAMAGE_CAUSE_IMMUNITIES = {
         EntityDamageEvent.DamageCause.FIRE,
         EntityDamageEvent.DamageCause.FIRE_TICK,
         EntityDamageEvent.DamageCause.LAVA
     };
-
     public static final String[] DEATH_MESSAGES = {
             "{0} had their life extinguished by water",
             "{0} couldn't swim",
@@ -43,8 +41,7 @@ public class WyvernAbility extends Ability {
 
     private final Cooldown fireballCooldown = new Cooldown(15.0);
 
-    private BukkitTask rainDamageTask = null;
-    private BukkitTask submergeDamageTask = null;
+    private BukkitTask waterDamageTask = null;
 
     @Override
     public void initialize() {
@@ -65,74 +62,20 @@ public class WyvernAbility extends Ability {
     public void run() {
         Player player = owner.getPlayer();
 
-        if (player != null) {
-            World world = player.getWorld();
-
-            Block block = world.getBlockAt(player.getLocation());
-
-            if (block.getType() == Material.WATER) {
-                if (submergeDamageTask != null && !submergeDamageTask.isCancelled()) {
-                    return;
-                }
-
-                submergeDamageTask = Bukkit.getScheduler().runTaskTimer(getPlugin(), () -> {
-                    // Set death message
-
-                    if (player.getHealth() <= SUBMERGE_DAMAGE) {
-                        DeathMessageManager.setNextDeathMessage(player.getUniqueId(), this);
-                    }
-
-                    player.damage(SUBMERGE_DAMAGE);
-                }, 0L, SUBMERGE_DAMAGE_INTERVAL_TICKS);
-            } else if (submergeDamageTask != null && !submergeDamageTask.isCancelled()) {
-                submergeDamageTask.cancel();
-            }
+        if (player == null) {
+            return;
         }
-    }
 
-    @EventHandler
-    public void WeatherChangeEvent(WeatherChangeEvent event) {
-        if (event.toWeatherState()) {
-            if (rainDamageTask != null) {
-                rainDamageTask.cancel();
-            }
-
-            rainDamageTask = Bukkit.getScheduler().runTaskTimer(getPlugin(), () -> {
-                Player player = owner.getPlayer();
-
-                if (player == null) {
-                    return;
-                }
-
-                // Check sky access
-
-                World world = event.getWorld();
-                Location location = player.getLocation();
-
-                if (world.getEnvironment() != World.Environment.NORMAL) {
-                    return;
-                }
-
-                int x = (int) location.getX();
-                int z = (int) location.getZ();
-
-                for (int y = (int) location.getY(); y < world.getMaxHeight(); ++y) {
-                    if (world.getBlockAt(x, y, z).getType() != Material.AIR) {
-                        return;
-                    }
-                }
-
-                // Set death message
-
-                if (player.getHealth() <= RAIN_DAMAGE) {
+        if (!Util.isInRain(player) && !Util.isInWater(player)) {
+            Util.safeTaskCancel(waterDamageTask);
+        } else if (Util.safeTaskIsCancelled(waterDamageTask)) {
+            waterDamageTask = Bukkit.getScheduler().runTaskTimer(getPlugin(), () -> {
+                if (WATER_DAMAGE >= player.getHealth()) {
                     DeathMessageManager.setNextDeathMessage(player.getUniqueId(), this);
                 }
 
-                player.damage(RAIN_DAMAGE);
-
-            }, RAIN_DAMAGE_INTERVAL_TICKS, RAIN_DAMAGE_INTERVAL_TICKS);
-        } else if (rainDamageTask != null) {
-            rainDamageTask.cancel();
+                Util.dealTrueDamage(player, WATER_DAMAGE);
+            }, 0L, WATER_DAMAGE_INTERVAL_TICKS);
         }
     }
 
@@ -213,7 +156,19 @@ public class WyvernAbility extends Ability {
         ItemStack itemStack = event.getItem();
 
         if (isOwner(player) && itemStack.getType() == Material.POTION) {
-            // TODO: Die when drinking water bottle
+            ItemMeta meta = itemStack.getItemMeta();
+
+            if (!(meta instanceof PotionMeta)) {
+                return;
+            }
+
+            PotionType potionType = ((PotionMeta) meta).getBasePotionData().getType();
+
+            if (potionType == PotionType.WATER || potionType == PotionType.MUNDANE || potionType == PotionType.AWKWARD) {
+                DeathMessageManager.setNextDeathMessage(player.getUniqueId(), this);
+
+                Util.dealTrueDamage(player, player.getHealth());
+            }
         }
     }
 

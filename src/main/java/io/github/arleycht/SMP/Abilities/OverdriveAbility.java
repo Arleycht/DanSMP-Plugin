@@ -242,8 +242,8 @@ public class OverdriveAbility extends Ability {
 
         float cost = getHealthCost();
 
-        victim.setHealth(Math.max(0.0, victim.getHealth() - cost));
-        attacker.setHealth(Math.max(0.0, attacker.getHealth() - cost));
+        Util.dealTrueDamage(victim, cost, attacker);
+        Util.dealTrueDamage(attacker, cost);
 
         event.setDamage(0.0);
 

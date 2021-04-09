@@ -56,25 +56,28 @@ public class Util {
         player.addPotionEffect(effect);
     }
 
+    public static boolean hasSkyAccess(@NotNull Player player) {
+        World world = player.getWorld();
+        Location location = player.getEyeLocation();
+        int x = location.getBlockX();
+        int z = location.getBlockZ();
+
+        for (int y = location.getBlockY(); y < world.getMaxHeight(); ++y) {
+            Material material = world.getBlockAt(x, y, z).getType();
+
+            if (material.isSolid()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public static boolean isInRain(@NotNull Player player) {
         World world = player.getWorld();
 
         if (world.getWeatherDuration() > 0 && world.getEnvironment() == World.Environment.NORMAL) {
-            // Check sky access
-
-            Location location = player.getEyeLocation();
-            int x = location.getBlockX();
-            int z = location.getBlockZ();
-
-            for (int y = location.getBlockY(); y < world.getMaxHeight(); ++y) {
-                Material material = world.getBlockAt(x, y, z).getType();
-
-                if (material.isSolid()) {
-                    return false;
-                }
-            }
-
-            return true;
+            return hasSkyAccess(player);
         }
 
         return false;

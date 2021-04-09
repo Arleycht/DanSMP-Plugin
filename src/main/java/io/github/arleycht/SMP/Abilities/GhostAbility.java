@@ -14,13 +14,46 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 public class GhostAbility extends Ability {
+    public static final long TASK_INTERVAL_TICKS = 5L * 20L;
+    public static final long DAY_START = 23000;
+    public static final long DAY_DURATION = 14000;
     public static final int MAX_PHASE_DISTANCE = 8;
     public static final int MAX_HEIGHT_CORRECTION = 5;
 
     private final Cooldown ABILITY_COOLDOWN = new Cooldown(5.0);
+
+    @Override
+    public boolean isRunnable() {
+        return true;
+    }
+
+    @Override
+    public long getTaskIntervalTicks() {
+        return TASK_INTERVAL_TICKS;
+    }
+
+    @Override
+    public void run() {
+        Player player = owner.getPlayer();
+
+        if (player == null) {
+            return;
+        }
+
+        World world = player.getWorld();
+
+        long modTime = Math.floorMod(world.getTime() - DAY_START, 24000);
+
+        if (Util.hasSkyAccess(player) && modTime < DAY_DURATION) {
+            Util.applyEffect(player, PotionEffectType.INVISIBILITY, 10.0f, 0, false, false, false);
+        } else {
+            player.removePotionEffect(PotionEffectType.INVISIBILITY);
+        }
+    }
 
     @EventHandler
     public void onPlayerInteractEvent(PlayerInteractEvent event) {

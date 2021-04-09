@@ -3,12 +3,21 @@ package io.github.arleycht.SMP.util;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Waterlogged;
+import org.bukkit.entity.Damageable;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,5 +53,96 @@ public class Util {
         PotionEffect effect = new PotionEffect(effectType, (int) (durationSeconds * 20), amplifier, ambient, particles, icon);
 
         player.addPotionEffect(effect);
+    }
+
+    public static boolean isInRain(@NotNull Player player) {
+        World world = player.getWorld();
+
+        if (world.getWeatherDuration() > 0 && world.getEnvironment() == World.Environment.NORMAL) {
+            // Check sky access
+
+            Location location = player.getEyeLocation();
+            int x = location.getBlockX();
+            int z = location.getBlockZ();
+
+            for (int y = location.getBlockY(); y < world.getMaxHeight(); ++y) {
+                Material material = world.getBlockAt(x, y, z).getType();
+
+                if (material.isSolid()) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public static boolean isInWater(@NotNull Player player) {
+        Location location = player.getLocation();
+
+        final double playerWidthHalf = player.getWidth() * 0.5;
+        final double playerHeight = player.getHeight();
+        final int MAX_INCREMENTS = 3;
+
+        ArrayList<Vector> offsets = new ArrayList<>();
+
+        for (int yi = 0; yi < MAX_INCREMENTS; ++yi) {
+            for (int x = -1; x < 2; ++x) {
+                for (int z = -1; z < 2; ++z) {
+                    offsets.add(new Vector(
+                            x * playerWidthHalf,
+                            playerHeight * yi / ((double) MAX_INCREMENTS / 2),
+                            z * playerWidthHalf
+                    ));
+                }
+            }
+        }
+
+        for (Vector offset : offsets) {
+            Block block = location.clone().add(offset).getBlock();
+
+            Material m = block.getType();
+            BlockData data = block.getBlockData();
+
+            boolean waterLogged = data instanceof Waterlogged && ((Waterlogged) data).isWaterlogged();
+
+            if (m == Material.WATER || m == Material.KELP || waterLogged) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean safeTaskIsCancelled(@Nullable BukkitTask task) {
+        if (task == null) {
+            return true;
+        }
+
+        return task.isCancelled();
+    }
+
+    public static void safeTaskCancel(@Nullable BukkitTask task) {
+        if (task == null) {
+            return;
+        }
+
+        task.cancel();
+    }
+
+    public static void dealTrueDamage(Damageable damageable, double damage) {
+        double newHealth = Math.max(0.0, damageable.getHealth() - damage);
+
+        damageable.setHealth(newHealth);
+        damageable.damage(Double.MIN_VALUE);
+    }
+
+    public static void dealTrueDamage(Damageable damageable, double damage, Entity source) {
+        double newHealth = Math.max(0.0, damageable.getHealth() - damage);
+
+        damageable.setHealth(newHealth);
+        damageable.damage(Double.MIN_VALUE, source);
     }
 }

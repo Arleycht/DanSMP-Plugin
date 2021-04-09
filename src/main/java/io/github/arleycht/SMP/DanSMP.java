@@ -86,6 +86,7 @@ public class DanSMP extends JavaPlugin {
         ActorRegistry.addActor("Nyla", "4b8c2fd4-3cf4-4b77-9254-875c911806e6");
 
         ActorRegistry.addActor("Reginald", "f0606323-6f95-4b1a-9ca0-703c1f10ef2f");
+        ActorRegistry.addActor("Riku", "e94ce4ab-cd15-4a1b-8d0c-e7fc87d34a95");
 
         ActorRegistry.addActor("Sage", "d8e15ac6-a9fa-421d-93b1-6d0e98c14dff");
         ActorRegistry.addActor("Sergio", "57a22258-0e09-48a9-84af-4e888b5ab2e0");

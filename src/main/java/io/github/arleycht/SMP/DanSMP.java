@@ -135,6 +135,7 @@ public class DanSMP extends JavaPlugin {
         AbilityRegistry.registerAbility("Brother1n4rms", LongArmsAbility.class, this);
         AbilityRegistry.registerAbility("Daryll", EndermanAbility.class, this);
         AbilityRegistry.registerAbility("Reginald", PunchAbility.class, this);
+        AbilityRegistry.registerAbility("Brandon", LightningAbility.class, this);
     }
 
     private void registerCommand(String command, CommandExecutor executor, TabCompleter tabCompleter) {

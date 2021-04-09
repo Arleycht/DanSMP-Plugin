@@ -134,13 +134,14 @@ public class EndermanAbility extends Ability {
 
     @EventHandler
     public void onPlayerTeleport(PlayerTeleportEvent event) {
-        if (event.getCause() == PlayerTeleportEvent.TeleportCause.ENDER_PEARL) {
+        Player player = event.getPlayer();
+
+        if (isOwner(player) && event.getCause() == PlayerTeleportEvent.TeleportCause.ENDER_PEARL) {
             Location to = event.getTo();
 
             if (to != null) {
                 event.setCancelled(true);
 
-                Player player = event.getPlayer();
                 World world = player.getWorld();
 
                 player.teleport(to);

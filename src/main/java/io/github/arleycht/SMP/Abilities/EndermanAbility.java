@@ -18,8 +18,6 @@ import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
-import java.util.Random;
-
 public class EndermanAbility extends Ability {
     public static final long TASK_INTERVAL_TICKS = 20L;
     public static final double WATER_DAMAGE = 1.0;
@@ -121,10 +119,9 @@ public class EndermanAbility extends Ability {
         World world = player.getWorld();
         Location location = player.getEyeLocation();
 
-        Random rng = new Random();
         Vector velocity = location.clone().getDirection().normalize();
 
-        velocity.multiply(1.4 + (rng.nextDouble() * 0.1));
+        velocity.multiply(Util.nextDoubleRange(1.4, 1.5));
         velocity.add(player.getVelocity());
 
         EnderPearl pearl = world.spawn(location, EnderPearl.class);

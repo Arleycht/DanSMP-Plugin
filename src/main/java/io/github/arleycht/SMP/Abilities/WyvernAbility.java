@@ -134,7 +134,7 @@ public class WyvernAbility extends Ability {
 
         World world = player.getWorld();
 
-        world.playSound(player.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1.0f, 1.0f);
+        world.playSound(player.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1.0f, Util.nextFloatRange(0.9f, 1.0f));
 
         // Create fireball
 

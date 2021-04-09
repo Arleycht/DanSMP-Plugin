@@ -247,7 +247,7 @@ public class OverdriveAbility extends Ability {
 
         event.setDamage(0.0);
 
-        attacker.getWorld().playSound(attacker.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f);
+        attacker.getWorld().playSound(attacker.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, Util.nextFloatRange(0.75f, 1.0f));
     }
 
     @EventHandler

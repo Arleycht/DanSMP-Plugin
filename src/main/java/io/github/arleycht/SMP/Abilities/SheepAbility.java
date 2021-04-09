@@ -145,7 +145,7 @@ public class SheepAbility extends Ability {
 
                         Util.giveItem(player, Material.WHITE_WOOL, amount);
 
-                        world.playSound(player.getLocation(), Sound.ENTITY_SHEEP_SHEAR, 1.0f, 1.0f);
+                        world.playSound(player.getLocation(), Sound.ENTITY_SHEEP_SHEAR, 1.0f, Util.nextFloatRange(0.9f, 1.0f));
 
                         return;
                     }

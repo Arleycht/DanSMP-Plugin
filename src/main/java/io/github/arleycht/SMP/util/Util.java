@@ -172,4 +172,11 @@ public class Util {
 
         return min + ((new Random()).nextDouble() * (max - min));
     }
+
+    public static double angleBetween(Vector a, Vector b) {
+        a = a.clone().normalize();
+        b = b.clone().normalize();
+
+        return Math.acos(a.dot(b));
+    }
 }

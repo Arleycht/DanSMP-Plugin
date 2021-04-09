@@ -168,7 +168,7 @@ public class Util {
     public static int nextIntRange(int min, int max) {
         assert(max >= min);
 
-        return min + ((new Random()).nextInt() * (max - min));
+        return min + (int) ((new Random()).nextFloat() * (max - min));
     }
 
     public static float nextFloatRange(float min, float max) {

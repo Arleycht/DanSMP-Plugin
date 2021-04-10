@@ -86,7 +86,6 @@ public class DanSMP extends JavaPlugin {
         ActorRegistry.addActor("Nyla", "4b8c2fd4-3cf4-4b77-9254-875c911806e6");
 
         ActorRegistry.addActor("Reginald", "f0606323-6f95-4b1a-9ca0-703c1f10ef2f");
-        ActorRegistry.addActor("Riku", "e94ce4ab-cd15-4a1b-8d0c-e7fc87d34a95");
 
         ActorRegistry.addActor("Sage", "d8e15ac6-a9fa-421d-93b1-6d0e98c14dff");
         ActorRegistry.addActor("Sergio", "57a22258-0e09-48a9-84af-4e888b5ab2e0");
@@ -104,10 +103,12 @@ public class DanSMP extends JavaPlugin {
 
         // People who are not active on the server
 
+        ActorRegistry.addActor("jerry_jery", "f6f31062-d4a0-440f-a86b-327151be2b60");
         ActorRegistry.addActor("lil_gloomi", "8987b1c1-6726-46bb-a465-be0e1c9cf19e");
         ActorRegistry.addActor("MuyJugoso", "cf719917-ff6a-4606-80a7-32ab512ea10c");
         ActorRegistry.addActor("per_seph_one", "1a615087-022b-4474-8956-0c826f10e018");
         ActorRegistry.addActor("philly4321", "e7ac59d2-68ec-4474-810b-662602f78c2a");
+        ActorRegistry.addActor("Rikupam", "e94ce4ab-cd15-4a1b-8d0c-e7fc87d34a95");
         ActorRegistry.addActor("Sonacrownguard", "c4138cb6-1701-4550-8263-5217485c8e4d");
         ActorRegistry.addActor("YungWaffleFry", "ee6846d1-dcae-416e-8e9a-b944cb60777e");
 
@@ -137,7 +138,8 @@ public class DanSMP extends JavaPlugin {
         AbilityRegistry.registerAbility("Daryll", EndermanAbility.class, this);
         AbilityRegistry.registerAbility("Reginald", PunchAbility.class, this);
         AbilityRegistry.registerAbility("Brandon", LightningAbility.class, this);
-        AbilityRegistry.registerAbility("Riku", GhostAbility.class, this);
+        AbilityRegistry.registerAbility("Rikupam", GhostAbility.class, this);
+        AbilityRegistry.registerAbility("jerry_jery", SlimeAbility.class, this);
     }
 
     private void registerCommand(String command, CommandExecutor executor, TabCompleter tabCompleter) {

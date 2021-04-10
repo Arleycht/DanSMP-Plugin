@@ -1,5 +1,6 @@
 package io.github.arleycht.SMP.util;
 
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -137,7 +138,11 @@ public class Util {
     }
 
     public static void dealTrueDamage(Damageable damageable, double damage) {
-        if (damageable.isDead()) {
+        if (damageable.isDead() || damageable.isInvulnerable()) {
+            return;
+        }
+
+        if (damageable instanceof Player && ((Player) damageable).getGameMode() == GameMode.CREATIVE) {
             return;
         }
 
@@ -153,7 +158,11 @@ public class Util {
     }
 
     public static void dealTrueDamage(Damageable damageable, double damage, Entity source) {
-        if (damageable.isDead()) {
+        if (damageable.isDead() || damageable.isInvulnerable()) {
+            return;
+        }
+
+        if (damageable instanceof Player && ((Player) damageable).getGameMode() == GameMode.CREATIVE) {
             return;
         }
 

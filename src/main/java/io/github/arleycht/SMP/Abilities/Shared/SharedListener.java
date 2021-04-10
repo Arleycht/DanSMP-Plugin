@@ -8,9 +8,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionType;
+
+import java.util.UUID;
 
 public class SharedListener implements Listener {
     @EventHandler
@@ -38,7 +44,7 @@ public class SharedListener implements Listener {
 
         if (WaterAllergyManager.isValidProtection(heldItem)) {
             if (inventory.getHelmet() == null) {
-                ItemStack helmet = new ItemStack(Material.GLASS, 1);
+                ItemStack helmet = new ItemStack(heldItem.getType(), 1);
 
                 Util.decrementItemStack(heldItem, 1);
 
@@ -47,6 +53,29 @@ public class SharedListener implements Listener {
                 player.getWorld().playSound(player.getEyeLocation(), Sound.ITEM_BOTTLE_FILL, 1.0f, 1.0f);
 
                 event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerItemConsumeEvent(PlayerItemConsumeEvent event) {
+        Player player = event.getPlayer();
+        ItemStack itemStack = event.getItem();
+
+        if (WaterAllergyManager.isAllergic(player) && itemStack.getType() == Material.POTION) {
+            ItemMeta meta = itemStack.getItemMeta();
+
+            if (!(meta instanceof PotionMeta)) {
+                return;
+            }
+
+            PotionType potionType = ((PotionMeta) meta).getBasePotionData().getType();
+
+            if (potionType == PotionType.WATER || potionType == PotionType.MUNDANE || potionType == PotionType.AWKWARD) {
+                UUID uuid = player.getUniqueId();
+                DeathMessageManager.setNextDeathMessage(uuid, WaterAllergyManager.getAbility(uuid));
+
+                Util.dealTrueDamage(player, player.getHealth());
             }
         }
     }

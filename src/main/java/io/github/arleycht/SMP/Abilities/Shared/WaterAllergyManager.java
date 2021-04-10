@@ -24,9 +24,9 @@ public class WaterAllergyManager {
     private static BukkitTask waterDamageTask = null;
 
     public static void initialize(Plugin plugin) {
-        if (waterDamageTask == null) {
-            waterDamageTask = Bukkit.getScheduler().runTaskTimer(plugin, WaterAllergyManager::update, 0L, WATER_DAMAGE_INTERVAL_TICKS);
-        }
+        Util.safeTaskCancel(waterDamageTask);
+
+        waterDamageTask = Bukkit.getScheduler().runTaskTimer(plugin, WaterAllergyManager::update, 0L, WATER_DAMAGE_INTERVAL_TICKS);
     }
 
     public static void add(UUID uuid, Ability ability) {
@@ -35,6 +35,10 @@ public class WaterAllergyManager {
 
     public static void remove(UUID uuid) {
         ALLERGIC.remove(uuid);
+    }
+
+    @Nullable public static Ability getAbility(UUID uuid) {
+        return ALLERGIC.get(uuid);
     }
 
     public static boolean isAllergic(@Nullable Entity entity) {
@@ -93,7 +97,7 @@ public class WaterAllergyManager {
                 continue;
             }
 
-            if ((Util.isInRain(player) || Util.isInWater(player)) && !player.isDead()) {
+            if ((Util.isInRain(player) || player.isInWater()) && !player.isDead()) {
                 PlayerInventory inventory = player.getInventory();
                 ItemStack helmet = inventory.getHelmet();
 

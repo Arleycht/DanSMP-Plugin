@@ -1,9 +1,9 @@
 package io.github.arleycht.SMP.Abilities;
 
 import io.github.arleycht.SMP.Abilities.Shared.DeathMessageManager;
+import io.github.arleycht.SMP.Abilities.Shared.WaterAllergyManager;
 import io.github.arleycht.SMP.util.Cooldown;
 import io.github.arleycht.SMP.util.Util;
-import io.github.arleycht.SMP.Abilities.Shared.WaterAllergyManager;
 import org.bukkit.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
@@ -13,13 +13,9 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityToggleGlideEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionType;
 import org.bukkit.util.Vector;
 
 public class WyvernAbility extends Ability {
@@ -114,28 +110,6 @@ public class WyvernAbility extends Ability {
 
         fireball.setIsIncendiary(true);
         fireball.setYield(2.0f);
-    }
-
-    @EventHandler
-    public void onPlayerItemConsumeEvent(PlayerItemConsumeEvent event) {
-        Player player = event.getPlayer();
-        ItemStack itemStack = event.getItem();
-
-        if (isOwner(player) && itemStack.getType() == Material.POTION) {
-            ItemMeta meta = itemStack.getItemMeta();
-
-            if (!(meta instanceof PotionMeta)) {
-                return;
-            }
-
-            PotionType potionType = ((PotionMeta) meta).getBasePotionData().getType();
-
-            if (potionType == PotionType.WATER || potionType == PotionType.MUNDANE || potionType == PotionType.AWKWARD) {
-                DeathMessageManager.setNextDeathMessage(player.getUniqueId(), this);
-
-                Util.dealTrueDamage(player, player.getHealth());
-            }
-        }
     }
 
     @EventHandler

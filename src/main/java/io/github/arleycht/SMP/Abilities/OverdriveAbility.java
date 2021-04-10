@@ -67,7 +67,7 @@ public class OverdriveAbility extends Ability {
 
         ItemStack item = player.getInventory().getItem(hand);
 
-        float cost = getHealthCost();
+        float cost = (float) getHealthCost();
 
         PotionEffectType effectType = null;
         float duration = 0;
@@ -85,7 +85,7 @@ public class OverdriveAbility extends Ability {
                     power = 1;
                 }
 
-                cost = getHealthCost();
+                cost = (float) getHealthCost();
 
                 TextComponent component = new TextComponent(MessageFormat.format("{0} hearts", cost / 2.0f));
                 player.spigot().sendMessage(ChatMessageType.ACTION_BAR, component);
@@ -163,7 +163,7 @@ public class OverdriveAbility extends Ability {
             case MUSIC_DISC_MALL:
                 break;
             case MUSIC_DISC_MELLOHI:
-                // RESISTANCE
+                // JUMP
 
                 // Cap cost to 10 (5 hearts), limiting the max duration to 20 seconds
                 cost = Math.min(10.0f, cost);
@@ -240,7 +240,7 @@ public class OverdriveAbility extends Ability {
         trueDamageActive = false;
         attacker.removePotionEffect(PotionEffectType.GLOWING);
 
-        float cost = getHealthCost();
+        double cost = Math.min(getHealthCost(), attacker.getHealth());
 
         Util.dealTrueDamage(victim, cost, attacker);
         Util.dealTrueDamage(attacker, cost);
@@ -263,8 +263,8 @@ public class OverdriveAbility extends Ability {
         }
     }
 
-    private float getHealthCost() {
-        return (power / (float) MAX_POWER) * 20.0f;
+    private double getHealthCost() {
+        return (power / (double) MAX_POWER) * 20.0f;
     }
 
     @Override

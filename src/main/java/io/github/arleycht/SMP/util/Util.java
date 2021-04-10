@@ -32,9 +32,8 @@ public class Util {
      * @param player Player to give the ItemStack to
      * @param material The material that will be given
      * @param amount The amount that will be given
-     * @return Whether any items couldn't be stored in the player's inventory
      */
-    public static boolean giveItem(@NotNull Player player, @NotNull Material material, int amount) {
+    public static void giveItem(@NotNull Player player, @NotNull Material material, int amount) {
         ItemStack item = new ItemStack(material, amount);
         HashMap<Integer, ItemStack> leftovers = player.getInventory().addItem(item);
 
@@ -45,7 +44,6 @@ public class Util {
             world.dropItem(location, entry.getValue());
         }
 
-        return !leftovers.isEmpty();
     }
 
     public static void decrementItemStack(@NotNull ItemStack itemStack, int decrement) {
@@ -79,11 +77,11 @@ public class Util {
         int startY = location.getBlockY();
         int endY = world.getHighestBlockYAt(location);
 
-        if (startY < endY) {
-            return false;
+        if (startY > endY) {
+            return true;
         }
 
-        for (int y = startY; y < endY; ++y) {
+        for (int y = startY; y < endY + 1; ++y) {
             Material material = world.getBlockAt(x, y, z).getType();
 
             if (material.isSolid()) {

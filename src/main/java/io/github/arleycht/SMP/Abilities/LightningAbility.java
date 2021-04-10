@@ -3,7 +3,6 @@ package io.github.arleycht.SMP.Abilities;
 import io.github.arleycht.SMP.util.Cooldown;
 import io.github.arleycht.SMP.util.Util;
 import org.bukkit.*;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -17,8 +16,12 @@ import org.bukkit.util.Vector;
 import java.util.ArrayList;
 
 public class LightningAbility extends Ability {
+    public final double MAX_AIM_ANGLE = 10.0;
     public static final double MAX_BOLT_RANGE = 24.0;
-    public static final double BOLT_DAMAGE = 1.5;
+    public static final double MAX_BOLT_RANGE_SQUARED = Math.pow(MAX_BOLT_RANGE, 2.0);
+    public static final double BOLT_DAMAGE = 2.0;
+
+    public static final double HALF_PI = Math.PI / 2.0;
 
     private final Cooldown ABILITY_COOLDOWN = new Cooldown(1.5);
     private final Cooldown CHARGED_ABILITY_COOLDOWN = new Cooldown(30.0);
@@ -31,7 +34,7 @@ public class LightningAbility extends Ability {
             return;
         }
 
-        if (event.getAction() != Action.LEFT_CLICK_AIR || event.getAction() != Action.LEFT_CLICK_BLOCK) {
+        if (event.getAction() != Action.LEFT_CLICK_AIR && event.getAction() != Action.LEFT_CLICK_BLOCK) {
             return;
         }
 
@@ -50,11 +53,6 @@ public class LightningAbility extends Ability {
         World world = player.getWorld();
         Location location = player.getEyeLocation();
 
-        Block targetBlock = player.getTargetBlock(null, 100);
-        Location targetLocation = targetBlock.getLocation();
-
-        final double MAX_ABS_ANGLE = 10.0;
-
         Entity closestEntity = null;
         double closestAngle = Double.MAX_VALUE;
 
@@ -63,11 +61,19 @@ public class LightningAbility extends Ability {
                 continue;
             }
 
-            Vector com = e.getLocation().toVector().add(new Vector(0.0, e.getHeight() / 2.0, 0.0));
-            Vector dir = com.subtract(location.toVector());
+            Vector centerOfMass = e.getLocation().toVector().add(new Vector(0.0, e.getHeight() / 2.0, 0.0));
+            Vector dir = centerOfMass.subtract(location.toVector());
             double angle = Util.angleBetween(location.getDirection(), dir);
 
-            if (angle < closestAngle && Math.abs(angle) < MAX_BOLT_RANGE) {
+            if (angle > HALF_PI) {
+                continue;
+            }
+
+            if (angle < closestAngle && angle < MAX_AIM_ANGLE) {
+                if (e.getLocation().distanceSquared(location) > MAX_BOLT_RANGE_SQUARED) {
+                    continue;
+                }
+
                 closestEntity = e;
                 closestAngle = angle;
             }
@@ -129,7 +135,7 @@ public class LightningAbility extends Ability {
             previousNode = currentNode;
         }
 
-        world.playSound(midPos.toLocation(world), Sound.ENTITY_PLAYER_HURT_SWEET_BERRY_BUSH, 1.0f, Util.nextFloatRange(1.0f, 1.5f));
+        world.playSound(midPos.toLocation(world), Sound.ENTITY_PLAYER_HURT_SWEET_BERRY_BUSH, 2.0f, Util.nextFloatRange(1.0f, 1.5f));
 
         victim.damage(BOLT_DAMAGE, player);
     }

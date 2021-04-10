@@ -10,7 +10,7 @@ import org.bukkit.scheduler.BukkitTask;
 public class SlimeAbility extends Ability {
     public static final long TASK_INTERVAL_TICKS = 10L;
     public static final double WATER_DAMAGE = 1.0;
-    public static final long WATER_DAMAGE_INTERVAL_TICKS = 10L;
+    public static final long WATER_DAMAGE_INTERVAL_TICKS = 30L;
     public static final String[] DEATH_MESSAGES = {
             "{0} became too slimy",
             "{0} doesn't like water",
@@ -54,8 +54,7 @@ public class SlimeAbility extends Ability {
                     DeathMessageManager.setNextDeathMessage(player.getUniqueId(), this);
                 }
 
-                Util.dealTrueDamage(player, WATER_DAMAGE);
-            }, 0L, WATER_DAMAGE_INTERVAL_TICKS);
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_SLIME_JUMP, 1.0f, Util.nextFloatRange(0.8f, 1.2f));
         }
     }
 

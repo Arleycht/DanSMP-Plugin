@@ -1,6 +1,6 @@
 package io.github.arleycht.SMP.Abilities;
 
-import io.github.arleycht.SMP.Abilities.DeathMessage.DeathMessageManager;
+import io.github.arleycht.SMP.Abilities.Shared.DeathMessageManager;
 import io.github.arleycht.SMP.util.Cooldown;
 import io.github.arleycht.SMP.util.Util;
 import net.md_5.bungee.api.ChatMessageType;

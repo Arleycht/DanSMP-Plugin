@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public final class ActorRegistry {
@@ -42,6 +43,10 @@ public final class ActorRegistry {
 		}
 
 		ActorRegistry.plugin = plugin;
+	}
+
+	public static List<Actor> getActors() {
+		return ACTORS;
 	}
 
 	public static Actor getActorFromUsername(String username) {

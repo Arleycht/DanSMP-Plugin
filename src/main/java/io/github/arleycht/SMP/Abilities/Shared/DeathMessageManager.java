@@ -1,4 +1,4 @@
-package io.github.arleycht.SMP.Abilities.DeathMessage;
+package io.github.arleycht.SMP.Abilities.Shared;
 
 import io.github.arleycht.SMP.Abilities.Ability;
 import io.github.arleycht.SMP.util.Pair;

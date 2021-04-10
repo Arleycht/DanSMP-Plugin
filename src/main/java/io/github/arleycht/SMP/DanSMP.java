@@ -1,7 +1,8 @@
 package io.github.arleycht.SMP;
 
 import io.github.arleycht.SMP.Abilities.*;
-import io.github.arleycht.SMP.Abilities.DeathMessage.DeathMessageManager;
+import io.github.arleycht.SMP.Abilities.Shared.DeathMessageManager;
+import io.github.arleycht.SMP.Abilities.Shared.SharedListener;
 import io.github.arleycht.SMP.Characters.ActorRegistry;
 import io.github.arleycht.SMP.Commands.SMPCommandExecutor;
 import io.github.arleycht.SMP.Commands.SMPTabCompleter;
@@ -38,8 +39,6 @@ public class DanSMP extends JavaPlugin {
             initializeAbilities();
         } else {
             getLogger().info("DanSMP already initialized!");
-
-            return;
         }
     }
 
@@ -119,6 +118,8 @@ public class DanSMP extends JavaPlugin {
         AbilityRegistry.setPlugin(this);
 
         getServer().getPluginManager().registerEvents(DeathMessageManager.getInstance(), this);
+
+        this.getServer().getPluginManager().registerEvents(new SharedListener(), this);
 
         // TODO: Have these stored in JSON files too, my goodness
 

@@ -2,6 +2,7 @@ package io.github.arleycht.SMP.Abilities;
 
 import io.github.arleycht.SMP.Characters.Actor;
 import io.github.arleycht.SMP.Characters.ActorRegistry;
+import io.github.arleycht.SMP.Abilities.Shared.WaterAllergyManager;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -181,6 +182,8 @@ public final class AbilityRegistry {
 
         AbilityRegistry.plugin = plugin;
 
+        // Ability attribute events
+
         plugin.getServer().getPluginManager().registerEvents(new AbilityAttributeEventListener(), plugin);
 
         Bukkit.getScheduler().runTaskTimer(plugin, () -> {
@@ -188,6 +191,10 @@ public final class AbilityRegistry {
                 plugin.getServer().getPluginManager().callEvent(new AbilityAttributeEvent(player));
             }
         }, 0L, ABILITY_ATTRIBUTE_CHECK_INTERVAL);
+
+        // Water allergy
+
+        WaterAllergyManager.initialize(plugin);
     }
 
     public static void scheduleAbilityTask(Ability ability) {

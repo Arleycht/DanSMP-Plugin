@@ -48,6 +48,16 @@ public class Util {
         return !leftovers.isEmpty();
     }
 
+    public static void decrementItemStack(@NotNull ItemStack itemStack, int decrement) {
+        int amount = itemStack.getAmount();
+
+        if (amount > decrement) {
+            itemStack.setAmount(amount - decrement);
+        } else {
+            itemStack.setAmount(0);
+        }
+    }
+
     public static void applyEffect(@NotNull Player player, @NotNull PotionEffectType effectType, float durationSeconds, int amplifier) {
         PotionEffect effect = new PotionEffect(effectType, (int) (durationSeconds * 20), amplifier, false, true, true);
 

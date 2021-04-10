@@ -7,7 +7,7 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
-import io.github.arleycht.SMP.Abilities.DeathMessage.DeathMessageManager;
+import io.github.arleycht.SMP.Abilities.Shared.DeathMessageManager;
 import io.github.arleycht.SMP.util.Cooldown;
 import io.github.arleycht.SMP.util.Util;
 import org.bukkit.*;

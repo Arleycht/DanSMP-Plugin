@@ -1,6 +1,6 @@
 package io.github.arleycht.SMP.Abilities;
 
-import io.github.arleycht.SMP.Abilities.DeathMessage.DeathMessageManager;
+import io.github.arleycht.SMP.Abilities.Shared.DeathMessageManager;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;

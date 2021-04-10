@@ -1,8 +1,12 @@
 package io.github.arleycht.SMP.Abilities;
 
-import io.github.arleycht.SMP.Abilities.DeathMessage.DeathMessageManager;
+import io.github.arleycht.SMP.Abilities.Shared.DeathMessageManager;
 import io.github.arleycht.SMP.util.Util;
-import org.bukkit.*;
+import io.github.arleycht.SMP.Abilities.Shared.WaterAllergyManager;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,13 +19,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionType;
-import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 public class EndermanAbility extends Ability {
-    public static final long TASK_INTERVAL_TICKS = 20L;
-    public static final double WATER_DAMAGE = 1.0;
-    public static final long WATER_DAMAGE_INTERVAL_TICKS = 30L;
     public static final String[] DEATH_MESSAGES = {
             "{0} had their life extinguished by water",
             "{0} couldn't swim",
@@ -30,42 +30,11 @@ public class EndermanAbility extends Ability {
             "{0} became fish food"
     };
 
-    private BukkitTask waterDamageTask = null;
-
     @Override
     public void initialize() {
         DeathMessageManager.setDeathMessages(this, DEATH_MESSAGES);
-    }
 
-    @Override
-    public boolean isRunnable() {
-        return true;
-    }
-
-    @Override
-    public long getTaskIntervalTicks() {
-        return TASK_INTERVAL_TICKS;
-    }
-
-    @Override
-    public void run() {
-        Player player = owner.getPlayer();
-
-        if (player == null) {
-            return;
-        }
-
-        if ((!Util.isInRain(player) && !Util.isInWater(player)) || player.isDead()) {
-            Util.safeTaskCancel(waterDamageTask);
-        } else if (Util.safeTaskIsCancelled(waterDamageTask)) {
-            waterDamageTask = Bukkit.getScheduler().runTaskTimer(getPlugin(), () -> {
-                if (WATER_DAMAGE >= player.getHealth()) {
-                    DeathMessageManager.setNextDeathMessage(player.getUniqueId(), this);
-                }
-
-                Util.dealTrueDamage(player, WATER_DAMAGE);
-            }, 0L, WATER_DAMAGE_INTERVAL_TICKS);
-        }
+        WaterAllergyManager.add(owner.getUniqueId(), this);
     }
 
     @EventHandler

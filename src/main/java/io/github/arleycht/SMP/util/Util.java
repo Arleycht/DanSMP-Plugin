@@ -1,9 +1,6 @@
 package io.github.arleycht.SMP.util;
 
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Waterlogged;
@@ -77,7 +74,7 @@ public class Util {
     public static boolean isInRain(@NotNull Player player) {
         World world = player.getWorld();
 
-        if (world.getWeatherDuration() > 0 && world.getEnvironment() == World.Environment.NORMAL) {
+        if (!world.isClearWeather() && world.getEnvironment() == World.Environment.NORMAL) {
             return hasSkyAccess(player);
         }
 

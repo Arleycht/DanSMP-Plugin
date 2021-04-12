@@ -2,6 +2,7 @@ package io.github.arleycht.SMP.Abilities;
 
 import io.github.arleycht.SMP.Abilities.Shared.DeathMessageManager;
 import io.github.arleycht.SMP.Abilities.Shared.WaterAllergyManager;
+import io.github.arleycht.SMP.util.Cooldown;
 import io.github.arleycht.SMP.util.Util;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -11,13 +12,18 @@ import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 public class EndermanAbility extends Ability {
+    public static final double STRONG_ATTACK_MULTIPLIER = 1.5;
+    public static final EntityDamageEvent.DamageCause[] STRONG_ATTACKS = {
+            EntityDamageEvent.DamageCause.PROJECTILE,
+    };
     public static final String[] DEATH_MESSAGES = {
             "{0} had their life extinguished by water",
             "{0} couldn't swim",
@@ -25,6 +31,8 @@ public class EndermanAbility extends Ability {
             "{0} blubbed their last blub",
             "{0} became fish food"
     };
+
+    private final Cooldown ABILITY_COOLDOWN = new Cooldown(0.5);
 
     @Override
     public void initialize() {
@@ -45,19 +53,23 @@ public class EndermanAbility extends Ability {
             return;
         }
 
-        if (event.getHand() != EquipmentSlot.HAND) {
-            return;
-        }
-
         ItemStack handItem = event.getItem();
 
         if (handItem == null || handItem.getType() != Material.ENDER_PEARL) {
             return;
         }
 
-        // Activate ability
-
         event.setCancelled(true);
+
+        // Check cooldown
+
+        if (ABILITY_COOLDOWN.isNotReady()) {
+            return;
+        }
+
+        ABILITY_COOLDOWN.reset();
+
+        // Activate ability
 
         World world = player.getWorld();
         Location location = player.getEyeLocation();
@@ -90,7 +102,24 @@ public class EndermanAbility extends Ability {
                 player.teleport(to);
                 player.setFallDistance(0.0f);
                 player.setVelocity(new Vector(0.0, 0.0, 0.0));
+
+                world.playSound(event.getFrom(), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, Util.nextFloatRange(0.5f, 0.75f));
                 world.playSound(to, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0f, Util.nextFloatRange(0.9f, 1.1f));
+            }
+        }
+    }
+
+    @EventHandler
+    public void onEntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
+        if (isOwner(event.getDamager())) {
+            EntityDamageEvent.DamageCause cause = event.getCause();
+
+            for (EntityDamageEvent.DamageCause strongCause : STRONG_ATTACKS) {
+                if (cause == strongCause) {
+                    event.setDamage(event.getDamage() * STRONG_ATTACK_MULTIPLIER);
+
+                    return;
+                }
             }
         }
     }

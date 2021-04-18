@@ -5,10 +5,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
-import org.bukkit.entity.Damageable;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.potion.PotionEffectType;
@@ -83,9 +80,9 @@ public class LightAbility extends Ability {
         Entity attacker = event.getDamager();
         Entity entity = event.getEntity();
 
-        if (attacker instanceof Projectile) {
+        if (attacker instanceof Arrow) {
             // Get entity that shot the projectile
-            attacker = (Entity) ((Projectile) attacker).getShooter();
+            attacker = (Entity) ((Arrow) attacker).getShooter();
         }
 
         if (!(entity instanceof Damageable)) {

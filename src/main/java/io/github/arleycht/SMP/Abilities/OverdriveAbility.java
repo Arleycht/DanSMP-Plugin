@@ -40,8 +40,14 @@ public class OverdriveAbility extends Ability {
     private final Cooldown ABILITY_COOLDOWN = new Cooldown(1.5);
     private final Cooldown TRUE_DAMAGE_COOLDOWN = new Cooldown(30.0);
 
-    private boolean trueDamageWindingUp = false;
-    private boolean trueDamageActive = false;
+    private enum OverdriveState {
+        INACTIVE,
+        WINDING,
+        ACTIVE,
+        SPENT
+    }
+
+    private OverdriveState state = OverdriveState.INACTIVE;
 
     private int power = 1;
 
@@ -105,28 +111,31 @@ public class OverdriveAbility extends Ability {
                     break;
                 }
 
-                if (trueDamageActive || trueDamageWindingUp) {
+                if (state != OverdriveState.INACTIVE && state != OverdriveState.SPENT) {
                     break;
                 }
 
-                trueDamageWindingUp = true;
+                state = OverdriveState.WINDING;
 
+                // Wind up and active ticks
                 createTicker(0L, 5L, TRUE_DAMAGE_WIND_UP_TICKS);
                 createTicker(TRUE_DAMAGE_WIND_UP_TICKS + 2L, 10L, TRUE_DAMAGE_DURATION_TICKS - 2L - 40L);
                 createTicker(TRUE_DAMAGE_WIND_UP_TICKS + TRUE_DAMAGE_DURATION_TICKS - 38L, 5L, 40L);
 
+                // Wind up state change
                 Bukkit.getScheduler().runTaskLater(getPlugin(), () -> {
-                    trueDamageWindingUp = false;
-                    trueDamageActive = true;
+                    state = OverdriveState.ACTIVE;
 
                     Util.applyEffect(player, PotionEffectType.GLOWING, TRUE_DAMAGE_DURATION_TICKS / 20.0f, 0, true, true, true);
                 }, TRUE_DAMAGE_WIND_UP_TICKS);
 
+                // Deactivate after timer runs out
                 Bukkit.getScheduler().runTaskLater(getPlugin(), () -> {
-                    trueDamageWindingUp = false;
-                    trueDamageActive = false;
+                    if (TRUE_DAMAGE_COOLDOWN.isReady() && state == OverdriveState.ACTIVE) {
+                        state = OverdriveState.SPENT;
 
-                    TRUE_DAMAGE_COOLDOWN.reset();
+                        TRUE_DAMAGE_COOLDOWN.reset();
+                    }
                 }, TRUE_DAMAGE_WIND_UP_TICKS + TRUE_DAMAGE_DURATION_TICKS);
 
                 break;
@@ -238,14 +247,21 @@ public class OverdriveAbility extends Ability {
 
         // Deal true damage to both
 
-        if (!trueDamageActive) {
+        if (state != OverdriveState.ACTIVE) {
             return;
         }
+
+        // State change
+
+        state = OverdriveState.SPENT;
+
+        TRUE_DAMAGE_COOLDOWN.reset();
+
+        // Apply effect
 
         Player attacker = (Player) damager;
         Damageable victim = (Damageable) entity;
 
-        trueDamageActive = false;
         attacker.removePotionEffect(PotionEffectType.GLOWING);
 
         double cost = Math.min(getHealthCost(), attacker.getHealth());
@@ -261,12 +277,9 @@ public class OverdriveAbility extends Ability {
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
         if (isOwner(event.getEntity())) {
-            if (trueDamageActive) {
-                ABILITY_COOLDOWN.reset();
+            ABILITY_COOLDOWN.reset();
 
-                trueDamageWindingUp = false;
-                trueDamageActive = false;
-            }
+            state = OverdriveState.SPENT;
         }
     }
 
@@ -287,7 +300,7 @@ public class OverdriveAbility extends Ability {
 
             if (player != null) {
                 // Interrupt on player death
-                if (player.isDead()) {
+                if (player.isDead() || state == OverdriveState.SPENT) {
                     active.set(false);
 
                     return;

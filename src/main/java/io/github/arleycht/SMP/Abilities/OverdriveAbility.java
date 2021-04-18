@@ -34,7 +34,7 @@ public class OverdriveAbility extends Ability {
     };
 
     private final Cooldown SELECT_COOLDOWN = new Cooldown(0.1);
-    private final Cooldown ABILITY_COOLDOWN = new Cooldown(5.0);
+    private final Cooldown ABILITY_COOLDOWN = new Cooldown(1.5);
     private final Cooldown TRUE_DAMAGE_COOLDOWN = new Cooldown(30.0);
 
     private boolean trueDamageActive = false;
@@ -196,6 +196,12 @@ public class OverdriveAbility extends Ability {
         }
 
         if (ABILITY_COOLDOWN.isReady() && effectType != null) {
+            if (player.getHealth() <= cost) {
+                player.getWorld().playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1.0f, 2.0f);
+
+                return;
+            }
+
             ABILITY_COOLDOWN.reset();
 
             Util.applyEffect(player, effectType, duration, amplifier, true, true, true);

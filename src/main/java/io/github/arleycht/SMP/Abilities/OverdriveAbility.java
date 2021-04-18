@@ -22,9 +22,12 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.text.MessageFormat;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class OverdriveAbility extends Ability {
     public static final int MAX_POWER = 10;
+    public static final long TRUE_DAMAGE_WIND_UP_TICKS = 40L;
     public static final long TRUE_DAMAGE_DURATION_TICKS = 10L * 20L;
     public static final String[] ABILITY_DEATH_MESSAGES = {
             "{0} burnt out their servos",
@@ -37,8 +40,8 @@ public class OverdriveAbility extends Ability {
     private final Cooldown ABILITY_COOLDOWN = new Cooldown(1.5);
     private final Cooldown TRUE_DAMAGE_COOLDOWN = new Cooldown(30.0);
 
+    private boolean trueDamageWindingUp = false;
     private boolean trueDamageActive = false;
-    private BukkitTask trueDamageTickTask = null;
 
     private int power = 1;
 
@@ -102,30 +105,29 @@ public class OverdriveAbility extends Ability {
                     break;
                 }
 
-                TRUE_DAMAGE_COOLDOWN.reset();
-                trueDamageActive = true;
-
-                cost = 0.0f;
-
-                if (trueDamageTickTask != null) {
-                    trueDamageTickTask.cancel();
+                if (trueDamageActive || trueDamageWindingUp) {
+                    break;
                 }
 
-                trueDamageTickTask = Bukkit.getScheduler().runTaskTimer(getPlugin(), () -> {
-                    if (!trueDamageActive) {
-                        return;
-                    }
+                trueDamageWindingUp = true;
 
-                    player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 1.0f, 1.5f);
-                }, 0L, 20L);
+                createTicker(0L, 5L, TRUE_DAMAGE_WIND_UP_TICKS);
+                createTicker(TRUE_DAMAGE_WIND_UP_TICKS + 2L, 10L, TRUE_DAMAGE_DURATION_TICKS - 2L - 40L);
+                createTicker(TRUE_DAMAGE_WIND_UP_TICKS + TRUE_DAMAGE_DURATION_TICKS - 38L, 5L, 40L);
 
                 Bukkit.getScheduler().runTaskLater(getPlugin(), () -> {
-                    trueDamageActive = false;
-                    trueDamageTickTask.cancel();
-                }, TRUE_DAMAGE_DURATION_TICKS);
+                    trueDamageWindingUp = false;
+                    trueDamageActive = true;
 
-                effectType = PotionEffectType.GLOWING;
-                duration = TRUE_DAMAGE_DURATION_TICKS / 20.0f;
+                    Util.applyEffect(player, PotionEffectType.GLOWING, TRUE_DAMAGE_DURATION_TICKS / 20.0f, 0, true, true, true);
+                }, TRUE_DAMAGE_WIND_UP_TICKS);
+
+                Bukkit.getScheduler().runTaskLater(getPlugin(), () -> {
+                    trueDamageWindingUp = false;
+                    trueDamageActive = false;
+
+                    TRUE_DAMAGE_COOLDOWN.reset();
+                }, TRUE_DAMAGE_WIND_UP_TICKS + TRUE_DAMAGE_DURATION_TICKS);
 
                 break;
             case MUSIC_DISC_BLOCKS:
@@ -260,17 +262,48 @@ public class OverdriveAbility extends Ability {
     public void onPlayerDeath(PlayerDeathEvent event) {
         if (isOwner(event.getEntity())) {
             if (trueDamageActive) {
-                trueDamageActive = false;
-            }
+                ABILITY_COOLDOWN.reset();
 
-            if (trueDamageTickTask != null) {
-                trueDamageTickTask.cancel();
+                trueDamageWindingUp = false;
+                trueDamageActive = false;
             }
         }
     }
 
     private double getHealthCost() {
         return (power / (double) MAX_POWER) * 20.0f;
+    }
+
+    private void createTicker(long delay, long interval, long duration) {
+        AtomicBoolean active = new AtomicBoolean(true);
+        AtomicInteger counter = new AtomicInteger();
+
+        BukkitTask task = Bukkit.getScheduler().runTaskTimer(getPlugin(), () -> {
+            if (!active.get()) {
+                return;
+            }
+
+            Player player = owner.getPlayer();
+
+            if (player != null) {
+                // Interrupt on player death
+                if (player.isDead()) {
+                    active.set(false);
+
+                    return;
+                }
+
+                float pitch = (counter.getAndIncrement() % 4 == 0) ? 1.5f : 1.0f;
+
+                player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 1.0f, pitch);
+            }
+        }, delay, interval);
+
+        Bukkit.getScheduler().runTaskLater(getPlugin(), () -> {
+            active.set(false);
+
+            Util.safeTaskCancel(task);
+        }, delay + duration);
     }
 
     @Override

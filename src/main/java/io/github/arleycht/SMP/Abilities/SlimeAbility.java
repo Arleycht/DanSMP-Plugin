@@ -26,7 +26,7 @@ public class SlimeAbility extends Ability {
             "{0} became fish food"
     };
 
-    public static final double WEAK_ATTACK_MULTIPLIER = 2.0;
+    public static final double WEAK_ATTACK_MULTIPLIER = 1.5;
     public static final EntityDamageEvent.DamageCause[] WEAK_ATTACKS = {
             EntityDamageEvent.DamageCause.MAGIC,
             EntityDamageEvent.DamageCause.DRAGON_BREATH

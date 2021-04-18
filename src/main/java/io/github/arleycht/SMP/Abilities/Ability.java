@@ -55,9 +55,6 @@ public abstract class Ability implements Listener, Runnable {
         return isOwner(entity.getUniqueId());
     }
 
-    public abstract String getName();
-    public abstract String getDescription();
-
     public AttributeModifier[] getAttributeModifiers(Attribute attribute) {
         if (attributeModifiers.containsKey(attribute)) {
             ArrayList<AttributeModifier> modifiers = attributeModifiers.get(attribute);
@@ -97,4 +94,7 @@ public abstract class Ability implements Listener, Runnable {
     public void setOwner(Actor owner) {
         this.owner = owner;
     }
+
+    public abstract String getName();
+    public abstract String getDescription();
 }

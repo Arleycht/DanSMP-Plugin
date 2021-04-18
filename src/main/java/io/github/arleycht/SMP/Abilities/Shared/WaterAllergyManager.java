@@ -103,7 +103,7 @@ public class WaterAllergyManager {
 
                 double damage = isValidProtection(helmet) ? PROTECTED_WATER_DAMAGE : WATER_DAMAGE;
 
-                if (player.getHealth() <= damage) {
+                if (Util.isFatal(player, damage)) {
                     DeathMessageManager.setNextDeathMessage(uuid, ALLERGIC.get(uuid));
                 }
 

@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.Random;
 
 public class Util {
+    public static double TRUE_DAMAGE_AMOUNT = 0.000001;
+
     /**
      * Gives a player an ItemStack, dropping anything it couldn't store to the world.
      * @param player Player to give the ItemStack to
@@ -119,7 +121,7 @@ public class Util {
         task.cancel();
     }
 
-    public static void dealTrueDamage(Damageable damageable, double damage) {
+    public static void dealTrueDamage(Damageable damageable, double damageAmount) {
         if (damageable.isDead() || damageable.isInvulnerable()) {
             return;
         }
@@ -128,18 +130,25 @@ public class Util {
             return;
         }
 
-        double newHealth = Math.max(0.0, damageable.getHealth() - damage);
+        damageable.damage(TRUE_DAMAGE_AMOUNT);
 
-        damageable.damage(0.000001);
+        double newAbsorption = damageable.getAbsorptionAmount() - damageAmount;
 
-        if (damageable.isDead()) {
-            newHealth = 0.0;
+        damageable.setAbsorptionAmount(Math.max(0.0, newAbsorption));
+        damageAmount = Math.max(0.0, -newAbsorption);
+
+        if (damageAmount > 0.0) {
+            double newHealth = 0.0;
+
+            if (!damageable.isDead()) {
+                newHealth = Math.max(0.0, damageable.getHealth() - damageAmount);
+            }
+
+            damageable.setHealth(newHealth);
         }
-
-        damageable.setHealth(newHealth);
     }
 
-    public static void dealTrueDamage(Damageable damageable, double damage, Entity source) {
+    public static void dealTrueDamage(Damageable damageable, double damageAmount, Entity source) {
         if (damageable.isDead() || damageable.isInvulnerable()) {
             return;
         }
@@ -148,15 +157,27 @@ public class Util {
             return;
         }
 
-        double newHealth = Math.max(0.0, damageable.getHealth() - damage);
+        damageable.damage(TRUE_DAMAGE_AMOUNT, source);
 
-        damageable.damage(0.000001, source);
+        double newAbsorption = damageable.getAbsorptionAmount() - damageAmount;
 
-        if (damageable.isDead()) {
-            newHealth = 0.0;
+        damageable.setAbsorptionAmount(Math.max(0.0, newAbsorption));
+        damageAmount = Math.max(0.0, -newAbsorption);
+
+        if (damageAmount > 0.0) {
+            double newHealth = 0.0;
+
+            if (!damageable.isDead()) {
+                newHealth = Math.max(0.0, damageable.getHealth() - damageAmount);
+            }
+
+            damageable.setHealth(newHealth);
         }
+    }
 
-        damageable.setHealth(newHealth);
+    public static boolean isFatal(Damageable damageable, double finalDamage)
+    {
+        return damageable.getHealth() + damageable.getAbsorptionAmount() - finalDamage <= 0.0;
     }
 
     public static int nextIntRange(int min, int max) {

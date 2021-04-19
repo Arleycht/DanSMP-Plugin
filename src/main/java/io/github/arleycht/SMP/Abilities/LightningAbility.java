@@ -23,7 +23,7 @@ public class LightningAbility extends Ability {
 
     public static final double HALF_PI = Math.PI / 2.0;
 
-    private final Cooldown ABILITY_COOLDOWN = new Cooldown(1.5);
+    private final Cooldown ABILITY_COOLDOWN = new Cooldown(1.0);
     private final Cooldown CHARGED_ABILITY_COOLDOWN = new Cooldown(30.0);
 
     @EventHandler
@@ -137,7 +137,7 @@ public class LightningAbility extends Ability {
 
         world.playSound(midPos.toLocation(world), Sound.ENTITY_PLAYER_HURT_SWEET_BERRY_BUSH, 2.0f, Util.nextFloatRange(1.0f, 1.5f));
 
-        victim.damage(BOLT_DAMAGE, player);
+        Util.dealTrueDamage(victim, BOLT_DAMAGE, player);
     }
 
     @Override

@@ -22,6 +22,8 @@ import java.util.Random;
 public class Util {
     public static double TRUE_DAMAGE_AMOUNT = 0.000001;
 
+    private static Random rng = new Random();
+
     /**
      * Gives a player an ItemStack, dropping anything it couldn't store to the world.
      * @param player Player to give the ItemStack to
@@ -183,19 +185,19 @@ public class Util {
     public static int nextIntRange(int min, int max) {
         assert(max >= min);
 
-        return min + (int) ((new Random()).nextFloat() * (max - min));
+        return min + (int) (rng.nextFloat() * (max - min));
     }
 
     public static float nextFloatRange(float min, float max) {
         assert(max >= min);
 
-        return min + ((new Random()).nextFloat() * (max - min));
+        return min + (rng.nextFloat() * (max - min));
     }
 
     public static double nextDoubleRange(double min, double max) {
         assert(max >= min);
 
-        return min + ((new Random()).nextDouble() * (max - min));
+        return min + (rng.nextDouble() * (max - min));
     }
 
     public static double angleBetween(Vector a, Vector b) {

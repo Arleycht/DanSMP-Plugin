@@ -6,7 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
@@ -25,8 +25,8 @@ public class FortressAbility extends Ability {
 
     @Override
     public void initialize() {
-        AttributeModifier.Operation add = AttributeModifier.Operation.ADD_NUMBER;
-        AttributeModifier.Operation mul = AttributeModifier.Operation.ADD_SCALAR;
+        Operation add = Operation.ADD_NUMBER;
+        Operation mul = Operation.ADD_SCALAR;
 
         addAttributeModifier(Attribute.GENERIC_ARMOR, ADD_ARMOR, add);
         addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, KNOCKBACK_RESISTANCE_ADD, add);

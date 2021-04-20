@@ -2,7 +2,6 @@ package io.github.arleycht.SMP.Abilities.Shared;
 
 import io.github.arleycht.SMP.Abilities.Ability;
 import io.github.arleycht.SMP.util.Util;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -13,9 +12,6 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionType;
 
 import java.util.UUID;
 
@@ -63,30 +59,21 @@ public class SharedListener implements Listener {
         Player player = event.getPlayer();
         ItemStack itemStack = event.getItem();
 
-        if (WaterAllergyManager.isAllergic(player) && itemStack.getType() == Material.POTION) {
-            ItemMeta meta = itemStack.getItemMeta();
+        if (WaterAllergyManager.isAllergic(player) && WaterAllergyManager.isAllergenicPotion(itemStack)) {
+            UUID uuid = player.getUniqueId();
+            Ability[] abilities = WaterAllergyManager.getAbilities(uuid);
 
-            if (!(meta instanceof PotionMeta)) {
+            if (abilities.length <= 0) {
+                // This shouldn't happen, but it'll be obvious if it did during runtime
                 return;
             }
 
-            PotionType potionType = ((PotionMeta) meta).getBasePotionData().getType();
+            Ability ability = abilities[Util.nextIntRange(0, abilities.length)];
 
-            if (potionType == PotionType.WATER || potionType == PotionType.MUNDANE || potionType == PotionType.AWKWARD) {
-                UUID uuid = player.getUniqueId();
-                Ability[] abilities = WaterAllergyManager.getAbilities(uuid);
+            DeathMessageManager.setNextDeathMessage(uuid, ability);
 
-                if (abilities.length <= 0) {
-                    // This shouldn't happen, but it'll be obvious if it did during runtime
-                    return;
-                }
+            Util.dealTrueDamage(player, player.getHealth());
 
-                Ability ability = abilities[Util.nextIntRange(0, abilities.length)];
-
-                DeathMessageManager.setNextDeathMessage(uuid, ability);
-
-                Util.dealTrueDamage(player, player.getHealth());
-            }
         }
     }
 }

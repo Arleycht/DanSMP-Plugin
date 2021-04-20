@@ -92,7 +92,7 @@ public class WaterAllergyManager {
         return uuid != null && ALLERGIC.containsKey(uuid);
     }
 
-    public static boolean isDeadlyPotion(ItemStack itemStack) {
+    public static boolean isAllergenicPotion(ItemStack itemStack) {
         if (itemStack.getType() != Material.POTION && itemStack.getType() != Material.SPLASH_POTION) {
             return false;
         }
@@ -102,7 +102,15 @@ public class WaterAllergyManager {
         if (meta instanceof PotionMeta) {
             PotionType potionType = ((PotionMeta) meta).getBasePotionData().getType();
 
-            return potionType == PotionType.WATER || potionType == PotionType.MUNDANE || potionType == PotionType.AWKWARD;
+            switch (potionType) {
+                case WATER:
+                case AWKWARD:
+                case MUNDANE:
+                case THICK:
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         return false;

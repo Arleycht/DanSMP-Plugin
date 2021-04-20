@@ -69,6 +69,10 @@ public class OverdriveAbility extends Ability {
             return;
         }
 
+        if (event.getClickedBlock() != null && event.getClickedBlock().getType().isInteractable()) {
+            return;
+        }
+
         EquipmentSlot hand = event.getHand();
 
         if (hand == null) {

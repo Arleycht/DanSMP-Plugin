@@ -34,7 +34,7 @@ public class WyvernAbility extends Ability {
             "{0} became fish food"
     };
 
-    private final Cooldown ABILITY_COOLDOWN = new Cooldown(15.0);
+    private final Cooldown ABILITY_COOLDOWN = new Cooldown(10.0);
     private final Cooldown KNOCKDOWN_COOLDOWN = new Cooldown(10.0);
 
     @Override
@@ -83,7 +83,7 @@ public class WyvernAbility extends Ability {
             return;
         }
 
-        entity.getWorld().playSound(entity.getLocation(), Sound.);
+        entity.getWorld().playSound(entity.getLocation(), Sound.ENTITY_ARROW_HIT, 1.0f, 1.0f);
 
         KNOCKDOWN_COOLDOWN.reset();
     }
@@ -139,7 +139,7 @@ public class WyvernAbility extends Ability {
         fireball.setDirection(direction);
 
         fireball.setIsIncendiary(true);
-        fireball.setYield(2.0f);
+        fireball.setYield(3.0f);
     }
 
     @EventHandler

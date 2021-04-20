@@ -5,11 +5,13 @@ import io.github.arleycht.SMP.Abilities.Shared.WaterAllergyManager;
 import io.github.arleycht.SMP.util.Cooldown;
 import io.github.arleycht.SMP.util.Util;
 import org.bukkit.*;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityToggleGlideEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -33,6 +35,7 @@ public class WyvernAbility extends Ability {
     };
 
     private final Cooldown ABILITY_COOLDOWN = new Cooldown(15.0);
+    private final Cooldown KNOCKDOWN_COOLDOWN = new Cooldown(10.0);
 
     @Override
     public void initialize() {
@@ -56,6 +59,31 @@ public class WyvernAbility extends Ability {
                 entity.setFireTicks(0);
             }
         }
+    }
+
+    @EventHandler
+    public void onEntityDamageByEntityEvent(EntityDamageByEntityEvent event) {
+        Entity entity = event.getEntity();
+        Entity damager = event.getDamager();
+
+        if (!isOwner(entity)) {
+            return;
+        }
+
+        if (!(damager instanceof Arrow)) {
+            return;
+        }
+
+        if (KNOCKDOWN_COOLDOWN.isNotReady()) {
+            return;
+        }
+
+        if (!((Player) entity).isFlying())
+        {
+            return;
+        }
+
+        KNOCKDOWN_COOLDOWN.reset();
     }
 
     @EventHandler
@@ -125,10 +153,14 @@ public class WyvernAbility extends Ability {
     public void onEntityToggleGlideEvent(EntityToggleGlideEvent event) {
         Entity entity = event.getEntity();
 
-        if (entity instanceof Player) {
+        if (isOwner(entity) && entity instanceof Player) {
+            if (KNOCKDOWN_COOLDOWN.isNotReady()) {
+                return;
+            }
+
             Player player = (Player) entity;
 
-            if (isOwner(player) && !player.isOnGround() && !player.isFlying()) {
+            if (!player.isOnGround() && !player.isFlying()) {
                 event.setCancelled(true);
             }
         }

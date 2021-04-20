@@ -1,6 +1,7 @@
 package io.github.arleycht.SMP.Abilities;
 
 import io.github.arleycht.SMP.Abilities.Shared.DeathMessageManager;
+import io.github.arleycht.SMP.Abilities.Shared.WaterAllergyEvent;
 import io.github.arleycht.SMP.Abilities.Shared.WaterAllergyManager;
 import io.github.arleycht.SMP.util.Cooldown;
 import io.github.arleycht.SMP.util.Util;
@@ -10,6 +11,7 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -33,12 +35,20 @@ public class EndermanAbility extends Ability {
     };
 
     private final Cooldown ABILITY_COOLDOWN = new Cooldown(0.5);
+    private final Cooldown KNOCKDOWN_COOLDOWN = new Cooldown(5.0);
 
     @Override
     public void initialize() {
         DeathMessageManager.setDeathMessages(this, DEATH_MESSAGES);
 
         WaterAllergyManager.add(owner.getUniqueId(), this);
+    }
+
+    @EventHandler
+    public void onWaterAllergyEvent(WaterAllergyEvent event) {
+        if (isOwner(event.getPlayer())) {
+            KNOCKDOWN_COOLDOWN.reset();
+        }
     }
 
     @EventHandler
@@ -59,7 +69,15 @@ public class EndermanAbility extends Ability {
             return;
         }
 
-        event.setCancelled(true);
+        event.setUseItemInHand(Event.Result.DENY);
+
+        // Check knockdown
+
+        if (KNOCKDOWN_COOLDOWN.isNotReady()) {
+            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_COD_FLOP, 1.0f, 0.75f);
+
+            return;
+        }
 
         // Check cooldown
 

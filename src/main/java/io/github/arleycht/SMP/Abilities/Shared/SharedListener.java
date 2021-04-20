@@ -1,5 +1,6 @@
 package io.github.arleycht.SMP.Abilities.Shared;
 
+import io.github.arleycht.SMP.Abilities.Ability;
 import io.github.arleycht.SMP.util.Util;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -73,7 +74,16 @@ public class SharedListener implements Listener {
 
             if (potionType == PotionType.WATER || potionType == PotionType.MUNDANE || potionType == PotionType.AWKWARD) {
                 UUID uuid = player.getUniqueId();
-                DeathMessageManager.setNextDeathMessage(uuid, WaterAllergyManager.getAbility(uuid));
+                Ability[] abilities = WaterAllergyManager.getAbilities(uuid);
+
+                if (abilities.length <= 0) {
+                    // This shouldn't happen, but it'll be obvious if it did during runtime
+                    return;
+                }
+
+                Ability ability = abilities[Util.nextIntRange(0, abilities.length)];
+
+                DeathMessageManager.setNextDeathMessage(uuid, ability);
 
                 Util.dealTrueDamage(player, player.getHealth());
             }

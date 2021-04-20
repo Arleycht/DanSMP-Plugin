@@ -1,60 +1,111 @@
 package io.github.arleycht.SMP.Abilities.Shared;
 
 import io.github.arleycht.SMP.Abilities.Ability;
+import io.github.arleycht.SMP.Abilities.Shared.WaterAllergyEvent.WaterDamageCause;
 import io.github.arleycht.SMP.util.Util;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
 public class WaterAllergyManager {
+    private static final HashMap<UUID, ArrayList<Ability>> ALLERGIC = new HashMap<>();
+    private static final ArrayList<WaterAllergyEvent> eventQueue = new ArrayList<>();
+
     public static double WATER_DAMAGE = 1.0;
     public static long WATER_DAMAGE_INTERVAL_TICKS = 30L;
-
     public static double PROTECTED_WATER_DAMAGE = 0.25;
-
-    private static final HashMap<UUID, Ability> ALLERGIC = new HashMap<>();
+    private static BukkitTask waterCheckTask = null;
     private static BukkitTask waterDamageTask = null;
 
     public static void initialize(Plugin plugin) {
+        Util.safeTaskCancel(waterCheckTask);
         Util.safeTaskCancel(waterDamageTask);
 
-        waterDamageTask = Bukkit.getScheduler().runTaskTimer(plugin, WaterAllergyManager::update, 0L, WATER_DAMAGE_INTERVAL_TICKS);
+        waterCheckTask = Bukkit.getScheduler().runTaskTimer(plugin, WaterAllergyManager::update, 0L, 1L);
+        waterDamageTask = Bukkit.getScheduler().runTaskTimer(plugin, WaterAllergyManager::applyWaterDamage, 0L, WATER_DAMAGE_INTERVAL_TICKS);
     }
 
+    /**
+     * Register a water allergy with an ability
+     *
+     * @param uuid    Player UUID
+     * @param ability Ability that is registering the allergy
+     */
     public static void add(UUID uuid, Ability ability) {
-        ALLERGIC.put(uuid, ability);
+        if (ALLERGIC.containsKey(uuid)) {
+            ALLERGIC.get(uuid).add(ability);
+        } else {
+            ArrayList<Ability> l = new ArrayList<>();
+
+            l.add(ability);
+
+            ALLERGIC.put(uuid, l);
+        }
     }
 
-    public static void remove(UUID uuid) {
-        ALLERGIC.remove(uuid);
+    /**
+     * Unregisters a water allergy with an ability
+     *
+     * @param uuid    Player UUID
+     * @param ability Ability that is registering the allergy
+     */
+    public static void remove(UUID uuid, Ability ability) {
+        if (ALLERGIC.containsKey(uuid)) {
+            ArrayList<Ability> l = ALLERGIC.get(uuid);
+
+            l.remove(ability);
+
+            if (l.size() <= 0) {
+                ALLERGIC.remove(uuid);
+            }
+        }
     }
 
-    @Nullable public static Ability getAbility(UUID uuid) {
-        return ALLERGIC.get(uuid);
+    public static Ability[] getAbilities(UUID uuid) {
+        ArrayList<Ability> abilities = ALLERGIC.get(uuid);
+
+        if (abilities != null) {
+            return abilities.toArray(new Ability[0]);
+        }
+
+        return new Ability[0];
     }
 
     public static boolean isAllergic(@Nullable Entity entity) {
-        if (entity == null) {
-            return false;
-        }
-
-        return ALLERGIC.containsKey(entity.getUniqueId());
+        return entity != null && isAllergic(entity.getUniqueId());
     }
 
     public static boolean isAllergic(@Nullable UUID uuid) {
-        if (uuid == null) {
+        return uuid != null && ALLERGIC.containsKey(uuid);
+    }
+
+    public static boolean isDeadlyPotion(ItemStack itemStack) {
+        if (itemStack.getType() != Material.POTION && itemStack.getType() != Material.SPLASH_POTION) {
             return false;
         }
 
-        return ALLERGIC.containsKey(uuid);
+        ItemMeta meta = itemStack.getItemMeta();
+
+        if (meta instanceof PotionMeta) {
+            PotionType potionType = ((PotionMeta) meta).getBasePotionData().getType();
+
+            return potionType == PotionType.WATER || potionType == PotionType.MUNDANE || potionType == PotionType.AWKWARD;
+        }
+
+        return false;
     }
 
     public static boolean isValidProtection(@Nullable ItemStack itemStack) {
@@ -89,7 +140,35 @@ public class WaterAllergyManager {
         return false;
     }
 
+    private static void applyWaterDamage() {
+        for (WaterAllergyEvent event : eventQueue) {
+            Player player = event.getPlayer();
+
+            UUID uuid = player.getUniqueId();
+            double damage = event.getDamageAmount();
+
+            if (Util.isFatal(player, damage)) {
+                Ability[] abilities = getAbilities(uuid);
+
+                if (abilities.length <= 0) {
+                    // This should never happen
+                    Bukkit.getLogger().warning("No abilities mapped to player with water allergy?");
+
+                    continue;
+                }
+
+                Ability ability = abilities[Util.nextIntRange(0, abilities.length)];
+
+                DeathMessageManager.setNextDeathMessage(uuid, ability);
+            }
+
+            Util.dealTrueDamage(player, damage);
+        }
+    }
+
     private static void update() {
+        eventQueue.clear();
+
         for (Player player : Bukkit.getOnlinePlayers()) {
             UUID uuid = player.getUniqueId();
 
@@ -97,17 +176,30 @@ public class WaterAllergyManager {
                 continue;
             }
 
-            if ((Util.isInRain(player) || player.isInWater()) && !player.isDead()) {
+            if ((player.isInWater() || Util.isInRain(player)) && !player.isDead()) {
                 PlayerInventory inventory = player.getInventory();
                 ItemStack helmet = inventory.getHelmet();
 
-                double damage = isValidProtection(helmet) ? PROTECTED_WATER_DAMAGE : WATER_DAMAGE;
+                Ability[] abilities = WaterAllergyManager.getAbilities(uuid);
 
-                if (Util.isFatal(player, damage)) {
-                    DeathMessageManager.setNextDeathMessage(uuid, ALLERGIC.get(uuid));
+                if (abilities.length <= 0) {
+                    // This should never happen
+                    Bukkit.getLogger().warning("No abilities mapped to player with water allergy?");
+
+                    continue;
                 }
 
-                Util.dealTrueDamage(player, damage);
+                boolean hasProtection = isValidProtection(helmet);
+                double damage = hasProtection ? PROTECTED_WATER_DAMAGE : WATER_DAMAGE;
+                WaterDamageCause cause = player.isInWater() ? WaterDamageCause.WATER : WaterDamageCause.RAIN;
+
+                WaterAllergyEvent event = new WaterAllergyEvent(player, damage, hasProtection, cause);
+
+                Bukkit.getPluginManager().callEvent(event);
+
+                if (!event.isCancelled()) {
+                    eventQueue.add(event);
+                }
             }
         }
     }

@@ -81,7 +81,7 @@ public class OverdriveAbility extends Ability {
 
         ItemStack item = player.getInventory().getItem(hand);
 
-        float cost = (float) getHealthCost();
+        double cost = getHealthCost();
 
         PotionEffectType effectType = null;
         float duration = 0;
@@ -99,12 +99,12 @@ public class OverdriveAbility extends Ability {
                     power = 1;
                 }
 
-                cost = (float) getHealthCost();
+                cost = getHealthCost();
 
                 TextComponent component = new TextComponent(MessageFormat.format("{0} hearts", cost / 2.0f));
                 player.spigot().sendMessage(ChatMessageType.ACTION_BAR, component);
 
-                float pitch = (cost / 20.0f) + 0.5f;
+                float pitch = ((float) cost / 20.0f) + 0.5f;
 
                 player.getWorld().playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 1.0f, pitch);
 
@@ -147,11 +147,9 @@ public class OverdriveAbility extends Ability {
             case MUSIC_DISC_BLOCKS:
                 // HASTE
 
-                // Cap cost to 10 (5 hearts), limiting the max duration to 20 seconds
-                cost = Math.min(10.0f, cost);
-
                 effectType = PotionEffectType.FAST_DIGGING;
-                duration = cost * 2.0f;
+                duration = (float) cost * 2.0f;
+                amplifier = cost > 7.0f ? 1 : 0;
 
                 break;
             case MUSIC_DISC_CAT:
@@ -161,7 +159,7 @@ public class OverdriveAbility extends Ability {
                 cost = Math.min(10.0f, cost);
 
                 effectType = PotionEffectType.SLOW_FALLING;
-                duration = cost * 2.0f;
+                duration = (float) cost * 2.0f;
 
                 break;
             case MUSIC_DISC_CHIRP:
@@ -173,7 +171,7 @@ public class OverdriveAbility extends Ability {
                 cost = Math.min(10.0f, cost);
 
                 effectType = PotionEffectType.SPEED;
-                duration = cost * 2.0f;
+                duration = (float) cost * 2.0f;
 
                 break;
             case MUSIC_DISC_MALL:
@@ -185,7 +183,7 @@ public class OverdriveAbility extends Ability {
                 cost = Math.min(10.0f, cost);
 
                 effectType = PotionEffectType.JUMP;
-                duration = cost * 2.0f;
+                duration = (float) cost * 2.0f;
                 amplifier = 1;
 
                 break;
@@ -204,7 +202,7 @@ public class OverdriveAbility extends Ability {
                 cost = Math.min(10.0f, cost);
 
                 effectType = PotionEffectType.DAMAGE_RESISTANCE;
-                duration = cost * 2.0f;
+                duration = (float) cost * 2.0f;
 
                 break;
             default:

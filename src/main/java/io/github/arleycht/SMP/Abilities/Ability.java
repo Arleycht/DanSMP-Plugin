@@ -59,7 +59,7 @@ public abstract class Ability implements Listener, Runnable {
         if (attributeModifiers.containsKey(attribute)) {
             ArrayList<AttributeModifier> modifiers = attributeModifiers.get(attribute);
 
-            return modifiers.toArray(new AttributeModifier[modifiers.size()]);
+            return modifiers.toArray(new AttributeModifier[0]);
         }
 
         return new AttributeModifier[0];

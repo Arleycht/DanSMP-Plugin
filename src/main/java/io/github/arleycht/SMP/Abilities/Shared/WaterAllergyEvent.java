@@ -36,6 +36,10 @@ public class WaterAllergyEvent extends Event implements Cancellable {
         return cause;
     }
 
+    public void setDamageAmount(double damageAmount) {
+        this.damageAmount = damageAmount;
+    }
+
     public double getDamageAmount() {
         return damageAmount;
     }

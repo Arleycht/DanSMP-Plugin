@@ -22,7 +22,7 @@ import java.util.Random;
 public class Util {
     public static double TRUE_DAMAGE_AMOUNT = 0.000001;
 
-    private static Random rng = new Random();
+    private static final Random rng = new Random();
 
     /**
      * Gives a player an ItemStack, dropping anything it couldn't store to the world.

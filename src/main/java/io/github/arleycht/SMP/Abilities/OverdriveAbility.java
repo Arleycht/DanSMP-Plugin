@@ -208,6 +208,7 @@ public class OverdriveAbility extends Ability {
         }
 
         if (ABILITY_COOLDOWN.isReady() && effectType != null) {
+            // Use health for cost, absorption hearts should not count for balance reasons
             if (player.getHealth() <= cost) {
                 player.getWorld().playSound(player.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1.0f, 2.0f);
 

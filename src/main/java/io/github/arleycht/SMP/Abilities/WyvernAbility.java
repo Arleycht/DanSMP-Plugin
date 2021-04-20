@@ -83,6 +83,8 @@ public class WyvernAbility extends Ability {
             return;
         }
 
+        entity.getWorld().playSound(entity.getLocation(), Sound.);
+
         KNOCKDOWN_COOLDOWN.reset();
     }
 

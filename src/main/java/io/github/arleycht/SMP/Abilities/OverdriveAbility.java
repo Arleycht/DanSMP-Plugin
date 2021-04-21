@@ -33,7 +33,7 @@ public class OverdriveAbility extends Ability {
     public static final String[] ABILITY_DEATH_MESSAGES = {
             "{0} burnt out their servos",
             "{0} released the magic smoke",
-            "{0}\'s operating system crashed",
+            "{0}''s operating system crashed",
             "{0} encountered a fatal error"
     };
 

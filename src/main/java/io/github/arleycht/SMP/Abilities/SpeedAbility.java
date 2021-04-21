@@ -68,6 +68,10 @@ public class SpeedAbility extends Ability {
 
         switch (state) {
             case INACTIVE:
+                if (moving) {
+                    stationaryCounter = 0;
+                }
+
                 if (stationaryCounter >= STATIONARY_LAG_TICKS) {
                     addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED, MUL_LAG, mul);
                     Bukkit.getPluginManager().callEvent(new AbilityAttributeEvent(player));
@@ -82,6 +86,10 @@ public class SpeedAbility extends Ability {
 
                 break;
             case ACTIVE:
+                if (moving) {
+                    stationaryCounter = 0;
+                }
+
                 if (stationaryCounter >= STATIONARY_LAG_TICKS) {
                     clearAttributeModifiers();
                     addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED, MUL_LAG, mul);

@@ -1,8 +1,8 @@
 package io.github.arleycht.SMP.Abilities;
 
+import io.github.arleycht.SMP.Abilities.Shared.WaterAllergyManager;
 import io.github.arleycht.SMP.Characters.Actor;
 import io.github.arleycht.SMP.Characters.ActorRegistry;
-import io.github.arleycht.SMP.Abilities.Shared.WaterAllergyManager;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -15,10 +15,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public final class AbilityRegistry {
     public static final String ABILITY_ATTRIBUTE_MODIFIER_NAME = "Ability Modifier";
@@ -50,8 +47,6 @@ public final class AbilityRegistry {
 
         @EventHandler
         public void onAbilityAttributeEvent(AbilityAttributeEvent event) {
-            //Bukkit.getLogger().info("Attribute event!");
-
             applyModifiers(event.getPlayer());
         }
 

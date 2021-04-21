@@ -16,7 +16,7 @@ import org.bukkit.util.Vector;
 
 public class SpeedAbility extends Ability {
     public static final long TASK_INTERVAL_TICKS = 1L;
-    public static final long STATIONARY_LAG_TICKS = 3L * 20L;
+    public static final long STATIONARY_LAG_TICKS = 2L * 20L;
     public static final double MUL_SPEED = 0.5;
     public static final double MUL_LAG = -0.2;
     public static final float ADD_EXHAUSTION = 0.2f;
@@ -125,7 +125,7 @@ public class SpeedAbility extends Ability {
                     if (world.getTime() % 5 == 0) {
                         float p = 1.0f - (stationaryCounter / (float) STATIONARY_LAG_TICKS);
 
-                        world.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 1.0f, 0.5f + (p * 0.5f));
+                        world.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 0.2f, 0.5f + (p * 0.5f));
                     }
                 }
 

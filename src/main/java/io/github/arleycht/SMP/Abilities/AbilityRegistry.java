@@ -183,7 +183,7 @@ public final class AbilityRegistry {
 
         Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
-                plugin.getServer().getPluginManager().callEvent(new AbilityAttributeEvent(player));
+                Bukkit.getPluginManager().callEvent(new AbilityAttributeEvent(player));
             }
         }, 0L, ABILITY_ATTRIBUTE_CHECK_INTERVAL);
 

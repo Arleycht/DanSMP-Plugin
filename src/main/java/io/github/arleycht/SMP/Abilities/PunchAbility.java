@@ -64,6 +64,10 @@ public class PunchAbility extends Ability {
         Entity attacker = event.getDamager();
         Entity entity = event.getEntity();
 
+        if (!active) {
+            return;
+        }
+
         if (attacker instanceof Projectile) {
             // Get entity that shot the projectile
             attacker = (Entity) ((Projectile) attacker).getShooter();
@@ -77,17 +81,13 @@ public class PunchAbility extends Ability {
             return;
         }
 
-        if (!active) {
-            return;
-        }
+        active = false;
 
         event.setCancelled(true);
 
         Player victim = (Player) entity;
 
         Util.dealTrueDamage(victim, victim.getHealth(), attacker);
-
-        active = false;
     }
 
     @Override

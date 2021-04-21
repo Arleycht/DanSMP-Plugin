@@ -147,6 +147,9 @@ public class OverdriveAbility extends Ability {
             case MUSIC_DISC_BLOCKS:
                 // HASTE
 
+                // <4 HEARTS = HASTE I
+                // >4 HEARTS = HASTE II
+
                 effectType = PotionEffectType.FAST_DIGGING;
                 duration = (float) cost * 2.0f;
                 amplifier = cost > 7.0f ? 1 : 0;
@@ -154,9 +157,6 @@ public class OverdriveAbility extends Ability {
                 break;
             case MUSIC_DISC_CAT:
                 // SLOW FALLING
-
-                // Cap cost to 10 (5 hearts), limiting the max duration to 20 seconds
-                cost = Math.min(10.0f, cost);
 
                 effectType = PotionEffectType.SLOW_FALLING;
                 duration = (float) cost * 2.0f;
@@ -167,20 +167,18 @@ public class OverdriveAbility extends Ability {
             case MUSIC_DISC_FAR:
                 // SPEED
 
-                // Cap cost to 10 (5 hearts), limiting the max duration to 20 seconds
-                cost = Math.min(10.0f, cost);
+                // <4 HEARTS = SPEED I
+                // >4 HEARTS = SPEED II
 
                 effectType = PotionEffectType.SPEED;
                 duration = (float) cost * 2.0f;
+                amplifier = cost > 7.0f ? 1 : 0;
 
                 break;
             case MUSIC_DISC_MALL:
                 break;
             case MUSIC_DISC_MELLOHI:
                 // JUMP
-
-                // Cap cost to 10 (5 hearts), limiting the max duration to 20 seconds
-                cost = Math.min(10.0f, cost);
 
                 effectType = PotionEffectType.JUMP;
                 duration = (float) cost * 2.0f;

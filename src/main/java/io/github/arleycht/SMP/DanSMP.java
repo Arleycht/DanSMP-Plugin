@@ -3,6 +3,7 @@ package io.github.arleycht.SMP;
 import io.github.arleycht.SMP.Abilities.*;
 import io.github.arleycht.SMP.Abilities.Shared.DeathMessageManager;
 import io.github.arleycht.SMP.Abilities.Shared.SharedListener;
+import io.github.arleycht.SMP.Artifacts.ArtifactManager;
 import io.github.arleycht.SMP.Characters.ActorRegistry;
 import io.github.arleycht.SMP.Commands.SMPCommandExecutor;
 import io.github.arleycht.SMP.Commands.SMPTabCompleter;
@@ -37,6 +38,7 @@ public class DanSMP extends JavaPlugin {
             initializeCommands();
             initializeCharacters();
             initializeAbilities();
+            initializeArtifacts();
         } else {
             getLogger().info("DanSMP already initialized!");
         }
@@ -141,6 +143,10 @@ public class DanSMP extends JavaPlugin {
         AbilityRegistry.registerAbility("Brandon", LightningAbility.class, this);
         AbilityRegistry.registerAbility("Rikupam", GhostAbility.class, this);
         AbilityRegistry.registerAbility("jerry_jery", SlimeAbility.class, this);
+    }
+
+    private void initializeArtifacts() {
+        ArtifactManager.initialize(this);
     }
 
     private void registerCommand(String command, CommandExecutor executor, TabCompleter tabCompleter) {

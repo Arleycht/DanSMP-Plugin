@@ -48,7 +48,7 @@ public class OverdriveAbility extends Ability {
         SPENT
     }
 
-    private AtomicReference<OverdriveState> state = new AtomicReference<>(OverdriveState.INACTIVE);
+    private final AtomicReference<OverdriveState> state = new AtomicReference<>(OverdriveState.INACTIVE);
 
     private int power = 1;
 

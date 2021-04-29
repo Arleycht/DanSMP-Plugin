@@ -108,7 +108,7 @@ public final class AbilityRegistry {
             ability.setPlugin(plugin);
             ability.setOwner(actor);
 
-            Bukkit.getServer().getPluginManager().registerEvents(ability, plugin);
+            Bukkit.getPluginManager().registerEvents(ability, plugin);
 
             ABILITIES.add(ability);
 

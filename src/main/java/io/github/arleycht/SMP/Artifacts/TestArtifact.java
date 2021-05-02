@@ -1,11 +1,17 @@
 package io.github.arleycht.SMP.Artifacts;
 
 import org.bukkit.Material;
+import org.bukkit.event.Listener;
 
-public class TestArtifact implements IArtifact {
+public class TestArtifact implements IArtifact, Listener {
     @Override
     public boolean allowDuplicates() {
-        return true;
+        return false;
+    }
+
+    @Override
+    public boolean allowDestruction() {
+        return false;
     }
 
     @Override
@@ -15,7 +21,9 @@ public class TestArtifact implements IArtifact {
 
     @Override
     public String[] getLore() {
-        return new String[0];
+        return new String[]{
+            "A test artifact that cannot be duplicated."
+        };
     }
 
     @Override

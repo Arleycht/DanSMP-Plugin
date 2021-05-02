@@ -1,8 +1,10 @@
 package io.github.arleycht.SMP.Commands;
 
 import io.github.arleycht.SMP.Artifacts.ArtifactManager;
+import io.github.arleycht.SMP.Artifacts.IArtifact;
 import io.github.arleycht.SMP.Artifacts.TestArtifact;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -48,12 +50,13 @@ public class SMPCommandExecutor implements CommandExecutor {
                 Bukkit.broadcastMessage(MessageFormat.format("Tagging: {0} x{1}", itemStack.getType(), itemStack.getAmount()));
 
                 if (itemStack.getAmount() > 0) {
-                    ArtifactManager.tagItem(itemStack, new TestArtifact());
-                }
+                    IArtifact artifact = new TestArtifact();
+                    Material artifactType = artifact.getType();
 
-                break;
-            case "playertest":
-                ArtifactManager.findArtifact();
+                    if (artifactType == null || itemStack.getType() == artifactType) {
+                        ArtifactManager.tagItem(itemStack, new TestArtifact());
+                    }
+                }
 
                 break;
             default:

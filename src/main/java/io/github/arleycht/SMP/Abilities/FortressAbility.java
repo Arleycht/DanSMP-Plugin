@@ -133,11 +133,15 @@ public class FortressAbility extends Ability {
             return;
         }
 
+        Player player = (Player) event.getEntity();
+
+        if (player.isBlocking()) {
+            return;
+        }
+
         HIT_COOLDOWN.reset();
 
         wasRegenerating = false;
-
-        Player player = (Player) event.getEntity();
 
         boolean hadArmor = armorHealth > 0.0;
 

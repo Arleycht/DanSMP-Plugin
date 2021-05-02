@@ -78,10 +78,10 @@ public class WyvernAbility extends Ability {
             return;
         }
 
-        if (!((Player) entity).isFlying())
+        /*if (!((Player) entity).isFlying())
         {
             return;
-        }
+        }*/
 
         entity.getWorld().playSound(entity.getLocation(), Sound.ENTITY_ARROW_HIT, 1.0f, 1.0f);
 

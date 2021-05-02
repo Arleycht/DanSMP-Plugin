@@ -10,13 +10,23 @@ import io.github.arleycht.SMP.Commands.SMPTabCompleter;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class DanSMP extends JavaPlugin {
+    private static Plugin plugin;
     private boolean initialized = false;
+
+    public static Plugin getPlugin() {
+        assert(plugin != null);
+
+        return plugin;
+    }
 
     @Override
     public void onEnable() {
+        plugin = this;
+
         initializeAll();
 
         AbilityRegistry.scheduleAllAbilityTasks();

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class BeeAbility extends Ability {
+    public static final long TASK_INTERVAL_TICKS = 20L;
     public static final int BEE_COUNT_MIN = 8;
     public static final int BEE_COUNT_MAX = 12;
     public static final int BEE_DELAY_MAX = 20;
@@ -31,6 +32,35 @@ public class BeeAbility extends Ability {
     private final Cooldown BEE_COOLDOWN = new Cooldown(45.0);
     private final Cooldown HONEY_BOTTLE_GENERATION_COOLDOWN = new Cooldown(1.5 * 60.0);
     private final Cooldown ABILITY_COOLDOWN = new Cooldown(10.0);
+
+    @Override
+    public boolean isRunnable() {
+        return true;
+    }
+
+    @Override
+    public long getTaskIntervalTicks() {
+        return TASK_INTERVAL_TICKS;
+    }
+
+    @Override
+    public void run() {
+        Player player = owner.getPlayer();
+
+        if (player == null) {
+            return;
+        }
+
+        for (Entity entity : player.getNearbyEntities(16.0, 16.0, 16.0)) {
+            if (entity instanceof Bee) {
+                Bee bee = (Bee) entity;
+
+                if (bee.getAnger() > 0 && isOwner(bee.getTarget())) {
+                    bee.setAnger(0);
+                }
+            }
+        }
+    }
 
     @EventHandler
     public void onPlayerInteractEvent(PlayerInteractEvent event) {
@@ -113,6 +143,12 @@ public class BeeAbility extends Ability {
         Entity entity = event.getEntity();
 
         if (isOwner(entity) && (damager instanceof LivingEntity)) {
+            if (damager instanceof Bee) {
+                event.setCancelled(true);
+
+                return;
+            }
+
             LivingEntity attacker = (LivingEntity) damager;
             Player victim = (Player) entity;
 
@@ -143,15 +179,19 @@ public class BeeAbility extends Ability {
             }
 
             BukkitTask beeTask = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+                if (attacker.isDead()) {
+                    return;
+                }
+
                 Vector diff, target, offset;
 
                 for (Bee bee : bees) {
-                    offset = new Vector(rng.nextFloat(), attacker.getEyeHeight() / 2, rng.nextFloat());
+                    offset = new Vector(rng.nextFloat(), attacker.getEyeHeight() * 0.5f, rng.nextFloat());
                     target = attacker.getLocation().toVector().add(offset);
                     diff = target.subtract(bee.getLocation().toVector());
 
                     bee.setTarget(attacker);
-                    bee.setVelocity(diff.normalize().multiply(0.5f));
+                    bee.setVelocity(diff.normalize().multiply(0.45f));
                     bee.setHasStung(false);
                 }
             }, 0, 5);

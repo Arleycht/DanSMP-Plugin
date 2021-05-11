@@ -4,7 +4,7 @@ import io.github.arleycht.SMP.Abilities.*;
 import io.github.arleycht.SMP.Abilities.Shared.DeathMessageManager;
 import io.github.arleycht.SMP.Abilities.Shared.SharedListener;
 import io.github.arleycht.SMP.Artifacts.ArtifactManager;
-import io.github.arleycht.SMP.Artifacts.TestArtifact;
+import io.github.arleycht.SMP.Artifacts.YumiArtifact;
 import io.github.arleycht.SMP.Characters.ActorRegistry;
 import io.github.arleycht.SMP.Commands.SMPCommandExecutor;
 import io.github.arleycht.SMP.Commands.SMPTabCompleter;
@@ -157,7 +157,7 @@ public class DanSMP extends JavaPlugin {
     private void initializeArtifacts() {
         ArtifactManager.initialize(this);
 
-        ArtifactManager.registerArtifact(new TestArtifact("The Test"));
+        ArtifactManager.registerArtifact(new YumiArtifact("Fujin Yumi"));
     }
 
     private void registerCommand(String command, CommandExecutor executor, TabCompleter tabCompleter) {

@@ -11,6 +11,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 public class ArtifactManager {
@@ -32,6 +33,16 @@ public class ArtifactManager {
         ARTIFACT_MAP.put(artifact.getName(), artifact);
 
         Bukkit.getPluginManager().registerEvents(artifact, DanSMP.getPlugin());
+    }
+
+    public static String[] getArtifactList() {
+        ArrayList<String> names = new ArrayList<>();
+
+        for (IArtifact artifact : ARTIFACT_MAP.values()) {
+            names.add(artifact.getName());
+        }
+
+        return names.toArray(new String[0]);
     }
 
     public static NamespacedKey getNamespacedKey(String key) {
@@ -57,11 +68,12 @@ public class ArtifactManager {
 
         ArrayList<String> lore = new ArrayList<>();
 
-        // Display
+        // Meta
 
         meta.setDisplayName(artifact.getName());
+        meta.setUnbreakable(!artifact.allowDestruction());
 
-        lore.add("Artifact");
+        Collections.addAll(lore, artifact.getLore());
 
         meta.setLore(lore);
 
@@ -74,6 +86,10 @@ public class ArtifactManager {
         data.set(getNamespacedKey("ArtifactName"), PersistentDataType.STRING, artifact.getName());
 
         itemStack.setItemMeta(meta);
+
+        // Initialize
+
+        artifact.initialize(itemStack);
     }
 
     public static IArtifact getArtifact(String artifactName) {

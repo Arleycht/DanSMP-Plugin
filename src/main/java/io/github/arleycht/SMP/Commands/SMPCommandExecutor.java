@@ -2,7 +2,7 @@ package io.github.arleycht.SMP.Commands;
 
 import io.github.arleycht.SMP.Artifacts.ArtifactManager;
 import io.github.arleycht.SMP.Artifacts.IArtifact;
-import org.bukkit.Bukkit;
+import io.github.arleycht.SMP.util.Util;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -43,23 +43,52 @@ public class SMPCommandExecutor implements CommandExecutor {
                 }
 
                 return true;
-            case "artifacttest":
-                ItemStack itemStack = player.getInventory().getItemInMainHand();
+            case "artifact":
+                if (args.length > 1) {
+                    switch (args[1].toLowerCase()) {
+                        case "list":
+                            player.sendMessage("Here are all the available artifacts:");
 
-                Bukkit.broadcastMessage(MessageFormat.format("Tagging: {0} x{1}", itemStack.getType(), itemStack.getAmount()));
+                            for (String name : ArtifactManager.getArtifactList()) {
+                                player.sendMessage(name);
+                            }
 
-                if (itemStack.getAmount() > 0) {
-                    final String artifactName = "The Test";
+                            return true;
+                        case "give":
+                            StringBuilder builder = new StringBuilder();
 
-                    IArtifact artifact = ArtifactManager.getArtifact(artifactName);
-                    Material artifactType = artifact.getType();
+                            for (int i = 2; i < args.length; ++i) {
+                                if (i > 2) {
+                                    builder.append(" ");
+                                }
 
-                    if (artifactType == null || itemStack.getType() == artifactType) {
-                        ArtifactManager.tagItem(itemStack, artifactName);
+                                builder.append(args[i]);
+                            }
+
+                            String artifactName = builder.toString();
+                            IArtifact artifact = ArtifactManager.getArtifact(artifactName);
+
+                            if (artifact == null) {
+                                player.sendMessage(MessageFormat.format("Artifact ''{0}'' doesn't exist!", artifactName));
+
+                                return true;
+                            }
+
+                            Material artifactType = artifact.getType() != null ? artifact.getType() : Material.STICK;
+
+                            ItemStack itemStack = new ItemStack(artifactType);
+
+                            ArtifactManager.tagItem(itemStack, artifactName);
+
+                            Util.giveItem(player, itemStack);
+
+                            return true;
+                        default:
+                            break;
                     }
                 }
 
-                return true;
+                break;
             default:
                 break;
         }

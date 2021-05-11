@@ -4,6 +4,9 @@ import io.github.arleycht.SMP.DanSMP;
 import io.github.arleycht.SMP.util.Util;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -237,9 +240,28 @@ public class ArtifactListener implements Listener {
 
     @EventHandler
     public void onArtifactDestructionEvent(ArtifactDestructionEvent event) {
+        TextComponent artifactName = new TextComponent(event.getArtifact().getName());
+
+        artifactName.setItalic(true);
+        artifactName.setColor(ChatColor.GOLD);
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        String[] lore = event.getArtifact().getLore();
+
+        for (int i = 0; i < lore.length; ++i) {
+            if (i > 0) {
+                stringBuilder.append("\n");
+            }
+
+            stringBuilder.append(lore[i]);
+        }
+
+        artifactName.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(stringBuilder.toString())));
+
         ComponentBuilder builder = new ComponentBuilder()
                 .append("The artifact ")
-                .append(event.getArtifact().getName()).italic(true).color(ChatColor.GOLD)
+                .append(artifactName)
                 .append(" was lost to the aether!").reset();
 
         Bukkit.spigot().broadcast(builder.create());

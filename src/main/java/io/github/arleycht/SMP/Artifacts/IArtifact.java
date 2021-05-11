@@ -1,14 +1,9 @@
 package io.github.arleycht.SMP.Artifacts;
 
 import org.bukkit.Material;
+import org.bukkit.event.Listener;
 
-public interface IArtifact {
-    /**
-     * Allow multiple instances of the artifact
-     * @return Whether multiple instances of the artifact should be allowed
-     */
-    boolean allowDuplicates();
-
+public interface IArtifact extends Listener {
     /**
      * Allow possible destruction of the artifact
      * @return Whether the artifact should be destroyable

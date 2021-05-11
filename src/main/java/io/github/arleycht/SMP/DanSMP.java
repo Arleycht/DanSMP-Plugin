@@ -4,6 +4,7 @@ import io.github.arleycht.SMP.Abilities.*;
 import io.github.arleycht.SMP.Abilities.Shared.DeathMessageManager;
 import io.github.arleycht.SMP.Abilities.Shared.SharedListener;
 import io.github.arleycht.SMP.Artifacts.ArtifactManager;
+import io.github.arleycht.SMP.Artifacts.TestArtifact;
 import io.github.arleycht.SMP.Characters.ActorRegistry;
 import io.github.arleycht.SMP.Commands.SMPCommandExecutor;
 import io.github.arleycht.SMP.Commands.SMPTabCompleter;
@@ -36,8 +37,6 @@ public class DanSMP extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        AbilityRegistry.cancelAllAbilityTasks();
-
         getLogger().info("DanSMP disabled!");
     }
 
@@ -157,6 +156,8 @@ public class DanSMP extends JavaPlugin {
 
     private void initializeArtifacts() {
         ArtifactManager.initialize(this);
+
+        ArtifactManager.registerArtifact(new TestArtifact("The Test"));
     }
 
     private void registerCommand(String command, CommandExecutor executor, TabCompleter tabCompleter) {

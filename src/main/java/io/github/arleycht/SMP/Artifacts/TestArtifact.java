@@ -1,12 +1,22 @@
 package io.github.arleycht.SMP.Artifacts;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.event.Listener;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerInteractEvent;
 
-public class TestArtifact implements IArtifact, Listener {
-    @Override
-    public boolean allowDuplicates() {
-        return false;
+public class TestArtifact implements IArtifact {
+    private final String artifactName;
+
+    public TestArtifact(String artifactName) {
+        this.artifactName = artifactName;
+    }
+
+    @EventHandler
+    public void onPlayerInteractEvent(PlayerInteractEvent event) {
+        if (ArtifactManager.getArtifact(event.getItem()) == this) {
+            Bukkit.broadcastMessage("Artifact was used!");
+        }
     }
 
     @Override
@@ -16,7 +26,7 @@ public class TestArtifact implements IArtifact, Listener {
 
     @Override
     public String getName() {
-        return "The Test";
+        return artifactName;
     }
 
     @Override

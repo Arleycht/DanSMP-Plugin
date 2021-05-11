@@ -1,17 +1,17 @@
 package io.github.arleycht.SMP.Artifacts;
 
+import io.github.arleycht.SMP.DanSMP;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 public class ArtifactManager {
     public static final HashMap<String, IArtifact> ARTIFACT_MAP = new HashMap<>();
@@ -28,6 +28,12 @@ public class ArtifactManager {
         Bukkit.getPluginManager().registerEvents(new ArtifactListener(), plugin);
     }
 
+    public static void registerArtifact(IArtifact artifact) {
+        ARTIFACT_MAP.put(artifact.getName(), artifact);
+
+        Bukkit.getPluginManager().registerEvents(artifact, DanSMP.getPlugin());
+    }
+
     public static NamespacedKey getNamespacedKey(String key) {
         return new NamespacedKey(plugin, key);
     }
@@ -35,11 +41,13 @@ public class ArtifactManager {
     /**
      * Tags an item as an artifact
      * @param itemStack ItemStack to tag
-     * @param artifact Artifact to associate with the ItemStack
+     * @param artifactName Artifact name to tag the ItemStack with
      */
-    public static void tagItem(ItemStack itemStack, IArtifact artifact) {
-        if (!ARTIFACT_MAP.containsKey(artifact.getName())) {
-            ARTIFACT_MAP.put(artifact.getName(), artifact);
+    public static void tagItem(ItemStack itemStack, String artifactName) {
+        IArtifact artifact = ARTIFACT_MAP.get(artifactName);
+
+        if (artifact == null) {
+            return;
         }
 
         ItemMeta meta = itemStack.getItemMeta();
@@ -50,6 +58,7 @@ public class ArtifactManager {
         ArrayList<String> lore = new ArrayList<>();
 
         // Display
+
         meta.setDisplayName(artifact.getName());
 
         lore.add("Artifact");
@@ -61,12 +70,17 @@ public class ArtifactManager {
         PersistentDataContainer data = meta.getPersistentDataContainer();
 
         // Name
+
         data.set(getNamespacedKey("ArtifactName"), PersistentDataType.STRING, artifact.getName());
 
         itemStack.setItemMeta(meta);
     }
 
-    public static IArtifact getArtifactFromItemStack(ItemStack itemStack) {
+    public static IArtifact getArtifact(String artifactName) {
+        return ARTIFACT_MAP.get(artifactName);
+    }
+
+    public static IArtifact getArtifact(ItemStack itemStack) {
         if (itemStack == null) {
             return null;
         }
@@ -87,12 +101,14 @@ public class ArtifactManager {
 
         String artifactName = data.get(nameKey, PersistentDataType.STRING);
 
-        Bukkit.broadcastMessage(MessageFormat.format("Checking {0} against registered artifacts", artifactName));
+        return ARTIFACT_MAP.get(artifactName);
+    }
 
-        for (Map.Entry<String, IArtifact> entry : ARTIFACT_MAP.entrySet()) {
-            Bukkit.broadcastMessage(entry.getKey());
+    public static IArtifact getArtifact(Item item) {
+        if (item == null) {
+            return null;
         }
 
-        return ARTIFACT_MAP.get(artifactName);
+        return getArtifact(item.getItemStack());
     }
 }

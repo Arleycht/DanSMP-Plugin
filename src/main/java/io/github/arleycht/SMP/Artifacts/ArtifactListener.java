@@ -1,21 +1,73 @@
 package io.github.arleycht.SMP.Artifacts;
 
+import io.github.arleycht.SMP.DanSMP;
+import io.github.arleycht.SMP.util.Util;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import org.bukkit.Bukkit;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.ItemDespawnEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
-import org.bukkit.inventory.*;
+import org.bukkit.event.inventory.InventoryPickupItemEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.inventory.AbstractHorseInventory;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitTask;
 
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ArtifactListener implements Listener {
+    private final HashMap<Item, IArtifact> DROPPED_ARTIFACTS = new HashMap<>();
+
+    public ArtifactListener() {
+        Bukkit.getScheduler().runTaskTimer(DanSMP.getPlugin(), () -> {
+            ArrayList<Map.Entry<Item, IArtifact>> deadItems = new ArrayList<>();
+
+            for (Map.Entry<Item, IArtifact> entry : DROPPED_ARTIFACTS.entrySet()) {
+                Item item = entry.getKey();
+                IArtifact artifact = entry.getValue();
+
+                if (item.isDead()) {
+                    deadItems.add(entry);
+                } else if (!artifact.allowDestruction()) {
+                    World world = item.getWorld();
+
+                    world.spawnParticle(Particle.ENCHANTMENT_TABLE, item.getLocation().clone().add(0.0, 1.0, 0.0), 25);
+                    world.playSound(item.getLocation(), Sound.BLOCK_BEACON_AMBIENT, 2.0f, 2.0f);
+                }
+            }
+
+            for (Map.Entry<Item, IArtifact> entry : deadItems) {
+                DROPPED_ARTIFACTS.remove(entry.getKey());
+
+                Bukkit.getPluginManager().callEvent(new ArtifactDestructionEvent(entry.getKey(), entry.getValue()));
+            }
+        }, 0L, 2L * 20L);
+    }
+
     @EventHandler
     public void onInventoryClickEvent(InventoryClickEvent event) {
-        ItemStack itemStack = null;
-        Inventory inventory = null;
+        ItemStack itemStack;
+        Inventory inventory;
 
         if (event.isShiftClick()) {
             itemStack = event.getCurrentItem();
@@ -25,7 +77,7 @@ public class ArtifactListener implements Listener {
             inventory = event.getClickedInventory();
         }
 
-        IArtifact artifact = ArtifactManager.getArtifactFromItemStack(itemStack);
+        IArtifact artifact = ArtifactManager.getArtifact(itemStack);
 
         if (artifact != null && !artifact.allowDestruction()) {
             if (IsPotentiallyDestructiveInventory(inventory)) {
@@ -37,7 +89,7 @@ public class ArtifactListener implements Listener {
     @EventHandler
     public void onInventoryDragEvent(InventoryDragEvent event) {
         ItemStack itemStack = event.getOldCursor();
-        IArtifact artifact = ArtifactManager.getArtifactFromItemStack(itemStack);
+        IArtifact artifact = ArtifactManager.getArtifact(itemStack);
 
         if (artifact != null && !artifact.allowDestruction()) {
             Inventory inventory = event.getInventory();
@@ -57,7 +109,7 @@ public class ArtifactListener implements Listener {
 
     @EventHandler
     public void onInventoryMoveItemEvent(InventoryMoveItemEvent event) {
-        IArtifact artifact = ArtifactManager.getArtifactFromItemStack(event.getItem());
+        IArtifact artifact = ArtifactManager.getArtifact(event.getItem());
 
         if (artifact != null && !artifact.allowDestruction()) {
             if (IsPotentiallyDestructiveInventory(event.getDestination())) {
@@ -67,22 +119,161 @@ public class ArtifactListener implements Listener {
     }
 
     @EventHandler
-    public void onItemSpawnEvent(ItemSpawnEvent event) {
-        Item entity = event.getEntity();
-
-        IArtifact artifact = ArtifactManager.getArtifactFromItemStack(entity.getItemStack());
+    public void onInventoryPickupItemEvent(InventoryPickupItemEvent event) {
+        IArtifact artifact = ArtifactManager.getArtifact(event.getItem());
 
         if (artifact != null && !artifact.allowDestruction()) {
-            // TODO: Just log what time the artifact was dropped so that way you can manually track where it goes
-
-
+            if (IsPotentiallyDestructiveInventory(event.getInventory())) {
+                event.setCancelled(true);
+            } else {
+                DROPPED_ARTIFACTS.remove(event.getItem());
+            }
         }
     }
 
+    @EventHandler
+    public void onItemSpawnEvent(ItemSpawnEvent event) {
+        Item item = event.getEntity();
+
+        IArtifact artifact = ArtifactManager.getArtifact(item);
+
+        if (artifact != null) {
+            DROPPED_ARTIFACTS.put(item, artifact);
+
+            String message = "The artifact {0} was dropped!";
+            Bukkit.getLogger().warning(MessageFormat.format(message, artifact.getName()));
+
+            for (Entity entity : item.getNearbyEntities(8.0, 8.0, 8.0)) {
+                if (entity instanceof Player) {
+                    Bukkit.getLogger().warning(MessageFormat.format("{0} was nearby!", entity.getName()));
+                }
+            }
+
+            if (!artifact.allowDestruction()) {
+                item.setInvulnerable(true);
+
+                AtomicReference<Item> atomicItem = new AtomicReference<>(item);
+                AtomicReference<BukkitTask> atomicTask = new AtomicReference<>();
+
+                atomicTask.set(Bukkit.getScheduler().runTaskTimer(DanSMP.getPlugin(), () -> {
+                    if (!atomicItem.get().isDead()) {
+                        Util.safeTaskCancel(atomicTask.get());
+                    } else {
+                        item.teleport(item);
+                    }
+                }, 0L, 1L));
+            }
+        }
+    }
+
+    @EventHandler
+    public void onEntityPickupItemEvent(EntityPickupItemEvent event) {
+        Entity entity = event.getEntity();
+        Item item = event.getItem();
+
+        IArtifact artifact = ArtifactManager.getArtifact(item);
+
+        if (artifact != null) {
+            DROPPED_ARTIFACTS.remove(item);
+
+            if (entity instanceof Player) {
+                Player player = (Player) entity;
+
+                ComponentBuilder builder = new ComponentBuilder()
+                        .append("You have picked up the artifact item ")
+                        .append(artifact.getName()).italic(true).color(ChatColor.GOLD)
+                        .append("!").reset();
+
+                player.spigot().sendMessage(builder.create());
+
+                String message = "The artifact {0} was picked up by {1}!";
+                Bukkit.getLogger().warning(MessageFormat.format(message, artifact.getName(), player.getName()));
+            } else {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onChunkLoadEvent(ChunkLoadEvent event) {
+        for (Entity entity : event.getChunk().getEntities()) {
+            if (entity instanceof Item) {
+                Item item = (Item) entity;
+                IArtifact artifact = ArtifactManager.getArtifact(item);
+
+                if (artifact != null) {
+                    DROPPED_ARTIFACTS.put(item, artifact);
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onChunkUnloadEvent(ChunkUnloadEvent event) {
+        for (Entity entity : event.getChunk().getEntities()) {
+            if (entity instanceof Item) {
+                Item item = (Item) entity;
+                IArtifact artifact = ArtifactManager.getArtifact(item);
+
+                if (artifact != null) {
+                    item.remove();
+
+                    Bukkit.getPluginManager().callEvent(new ArtifactDestructionEvent(item, artifact));
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onItemDespawnEvent(ItemDespawnEvent event) {
+        Item item = event.getEntity();
+
+        IArtifact artifact = ArtifactManager.getArtifact(item.getItemStack());
+
+        if (artifact != null) {
+            Bukkit.getPluginManager().callEvent(new ArtifactDestructionEvent(item, artifact));
+        }
+    }
+
+    @EventHandler
+    public void onArtifactDestructionEvent(ArtifactDestructionEvent event) {
+        ComponentBuilder builder = new ComponentBuilder()
+                .append("The artifact ")
+                .append(event.getArtifact().getName()).italic(true).color(ChatColor.GOLD)
+                .append(" was lost to the aether!").reset();
+
+        Bukkit.spigot().broadcast(builder.create());
+
+        String message = "The artifact {0} was lost to the aether!";
+        Bukkit.getLogger().warning(MessageFormat.format(message, event.getArtifact().getName()));
+
+        DROPPED_ARTIFACTS.remove(event.getEntity());
+    }
+
     public boolean IsPotentiallyDestructiveInventory(Inventory inventory) {
-        return !(inventory instanceof AbstractHorseInventory
-        || inventory instanceof DoubleChestInventory
-        || inventory instanceof LecternInventory
-        || inventory instanceof PlayerInventory);
+        if (inventory == null) {
+            return true;
+        }
+
+        switch (inventory.getType()) {
+            case PLAYER:
+            case CHEST:
+            case BARREL:
+            case ENDER_CHEST:
+            case SHULKER_BOX:
+            case LECTERN:
+            case DISPENSER:
+            case DROPPER:
+            case HOPPER:
+                return false;
+            default:
+                break;
+        }
+
+        if (inventory instanceof AbstractHorseInventory) {
+            return false;
+        }
+
+        return true;
     }
 }

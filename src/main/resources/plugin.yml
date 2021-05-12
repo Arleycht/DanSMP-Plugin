@@ -8,6 +8,24 @@ depend:
   - ProtocolLib
 commands:
   dansmp:
-    description: DanSMP command
-    usage: /<command>
-    persmission: dansmp.dansmp
+    description: The DanSMP command
+    usage: /<command> [list|give <artifact>]
+    persmission: dansmp
+permissions:
+  dansmp.*:
+    default: op
+    children:
+      dansmp.eject: true
+  dansmp.eject:
+    description: Ejects command user from any vehicle
+    default: not op
+  dansmp.artifact.*:
+    children:
+      dansmp.artifact.list: true
+      dansmp.artifact.give: true
+  dansmp.artifact.list:
+    description: Lists all available artifacts
+    default: not op
+  dansmp.artifact.give:
+    description: Gives artifacts
+    default: op

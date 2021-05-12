@@ -31,8 +31,8 @@ public class Util {
      * @param amount The amount that will be given
      */
     public static void giveItem(@NotNull Player player, @NotNull Material material, int amount) {
-        ItemStack item = new ItemStack(material, amount);
-        HashMap<Integer, ItemStack> leftovers = player.getInventory().addItem(item);
+        ItemStack itemStack = new ItemStack(material, amount);
+        HashMap<Integer, ItemStack> leftovers = player.getInventory().addItem(itemStack);
 
         Location location = player.getLocation();
         World world = player.getWorld();
@@ -40,7 +40,22 @@ public class Util {
         for (Map.Entry<Integer, ItemStack> entry : leftovers.entrySet()) {
             world.dropItem(location, entry.getValue());
         }
+    }
 
+    /**
+     * Gives a player an ItemStack, dropping anything it couldn't store to the world.
+     * @param player Player to give the ItemStack to
+     * @param itemStack The ItemStack to be given
+     */
+    public static void giveItem(@NotNull Player player, @NotNull ItemStack itemStack) {
+        HashMap<Integer, ItemStack> leftovers = player.getInventory().addItem(itemStack);
+
+        Location location = player.getLocation();
+        World world = player.getWorld();
+
+        for (Map.Entry<Integer, ItemStack> entry : leftovers.entrySet()) {
+            world.dropItem(location, entry.getValue());
+        }
     }
 
     public static void decrementItemStack(@NotNull ItemStack itemStack, int decrement) {

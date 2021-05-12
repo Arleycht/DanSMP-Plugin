@@ -4,19 +4,30 @@ import io.github.arleycht.SMP.Abilities.*;
 import io.github.arleycht.SMP.Abilities.Shared.DeathMessageManager;
 import io.github.arleycht.SMP.Abilities.Shared.SharedListener;
 import io.github.arleycht.SMP.Artifacts.ArtifactManager;
+import io.github.arleycht.SMP.Artifacts.YumiArtifact;
 import io.github.arleycht.SMP.Characters.ActorRegistry;
 import io.github.arleycht.SMP.Commands.SMPCommandExecutor;
 import io.github.arleycht.SMP.Commands.SMPTabCompleter;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class DanSMP extends JavaPlugin {
+    private static Plugin plugin;
     private boolean initialized = false;
+
+    public static Plugin getPlugin() {
+        assert(plugin != null);
+
+        return plugin;
+    }
 
     @Override
     public void onEnable() {
+        plugin = this;
+
         initializeAll();
 
         AbilityRegistry.scheduleAllAbilityTasks();
@@ -26,8 +37,6 @@ public class DanSMP extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        AbilityRegistry.cancelAllAbilityTasks();
-
         getLogger().info("DanSMP disabled!");
     }
 
@@ -147,6 +156,8 @@ public class DanSMP extends JavaPlugin {
 
     private void initializeArtifacts() {
         ArtifactManager.initialize(this);
+
+        ArtifactManager.registerArtifact(new YumiArtifact("Fujin Yumi"));
     }
 
     private void registerCommand(String command, CommandExecutor executor, TabCompleter tabCompleter) {

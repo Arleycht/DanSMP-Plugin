@@ -1,10 +1,9 @@
 package io.github.arleycht.SMP.Artifacts;
 
-import io.github.arleycht.SMP.Characters.Actor;
-import io.github.arleycht.SMP.Characters.ActorRegistry;
+import io.github.arleycht.SMP.DanSMP;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -12,17 +11,38 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
 
 public class ArtifactManager {
     public static final HashMap<String, IArtifact> ARTIFACT_MAP = new HashMap<>();
 
     private static Plugin plugin;
 
+    private ArtifactManager() {
+
+    }
+
     public static void initialize(Plugin plugin) {
         ArtifactManager.plugin = plugin;
+
+        Bukkit.getPluginManager().registerEvents(new ArtifactListener(), plugin);
+    }
+
+    public static void registerArtifact(IArtifact artifact) {
+        ARTIFACT_MAP.put(artifact.getName(), artifact);
+
+        Bukkit.getPluginManager().registerEvents(artifact, DanSMP.getPlugin());
+    }
+
+    public static String[] getArtifactList() {
+        ArrayList<String> names = new ArrayList<>();
+
+        for (IArtifact artifact : ARTIFACT_MAP.values()) {
+            names.add(artifact.getName());
+        }
+
+        return names.toArray(new String[0]);
     }
 
     public static NamespacedKey getNamespacedKey(String key) {
@@ -32,9 +52,15 @@ public class ArtifactManager {
     /**
      * Tags an item as an artifact
      * @param itemStack ItemStack to tag
-     * @param artifact Artifact to associate with the ItemStack
+     * @param artifactName Artifact name to tag the ItemStack with
      */
-    public static void tagItem(ItemStack itemStack, IArtifact artifact) {
+    public static void tagItem(ItemStack itemStack, String artifactName) {
+        IArtifact artifact = ARTIFACT_MAP.get(artifactName);
+
+        if (artifact == null) {
+            return;
+        }
+
         ItemMeta meta = itemStack.getItemMeta();
 
         assert(plugin != null);
@@ -42,10 +68,12 @@ public class ArtifactManager {
 
         ArrayList<String> lore = new ArrayList<>();
 
-        // Display
-        meta.setDisplayName(artifact.getName());
+        // Meta
 
-        lore.add("Artifact");
+        meta.setDisplayName(artifact.getName());
+        meta.setUnbreakable(!artifact.allowDestruction());
+
+        Collections.addAll(lore, artifact.getLore());
 
         meta.setLore(lore);
 
@@ -54,34 +82,21 @@ public class ArtifactManager {
         PersistentDataContainer data = meta.getPersistentDataContainer();
 
         // Name
+
         data.set(getNamespacedKey("ArtifactName"), PersistentDataType.STRING, artifact.getName());
 
         itemStack.setItemMeta(meta);
+
+        // Initialize
+
+        artifact.initialize(itemStack);
     }
 
-    public static void findArtifact() {
-        // Shallow check
-
-        List<OfflinePlayer> players;
-
-        for (OfflinePlayer player : Bukkit.getOfflinePlayers()) {
-            UUID uuid = player.getUniqueId();
-            Actor actor = ActorRegistry.getActorFromUuid(uuid);
-            String name = player.getName();
-
-            if (actor != null) {
-                Bukkit.broadcastMessage(actor.getRealName());
-            } else if (name != null) {
-                Bukkit.broadcastMessage(name);
-            } else {
-                Bukkit.broadcastMessage(uuid.toString());
-            }
-
-
-        }
+    public static IArtifact getArtifact(String artifactName) {
+        return ARTIFACT_MAP.get(artifactName);
     }
 
-    public static IArtifact getArtifactFromItemStack(ItemStack itemStack) {
+    public static IArtifact getArtifact(ItemStack itemStack) {
         if (itemStack == null) {
             return null;
         }
@@ -103,5 +118,13 @@ public class ArtifactManager {
         String artifactName = data.get(nameKey, PersistentDataType.STRING);
 
         return ARTIFACT_MAP.get(artifactName);
+    }
+
+    public static IArtifact getArtifact(Item item) {
+        if (item == null) {
+            return null;
+        }
+
+        return getArtifact(item.getItemStack());
     }
 }

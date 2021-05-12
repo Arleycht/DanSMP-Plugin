@@ -11,7 +11,9 @@ import java.util.List;
 
 public class SMPTabCompleter implements TabCompleter {
     public static final String[][] COMPLETIONS = {
-            {"eject"}
+            {"eject"},
+            {"artifact", "list"},
+            {"artifact", "give"},
     };
 
     @Nullable

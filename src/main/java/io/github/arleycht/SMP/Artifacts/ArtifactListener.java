@@ -16,6 +16,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.ItemDespawnEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
@@ -51,7 +52,7 @@ public class ArtifactListener implements Listener {
 
                 if (item.isDead()) {
                     deadItems.add(entry);
-                } else if (!artifact.allowDestruction()) {
+                } else {
                     World world = item.getWorld();
 
                     world.spawnParticle(Particle.ENCHANTMENT_TABLE, item.getLocation().clone().add(0.0, 1.0, 0.0), 25);
@@ -125,7 +126,7 @@ public class ArtifactListener implements Listener {
     public void onInventoryPickupItemEvent(InventoryPickupItemEvent event) {
         IArtifact artifact = ArtifactManager.getArtifact(event.getItem());
 
-        if (artifact != null && !artifact.allowDestruction()) {
+        if (artifact != null) {
             if (IsPotentiallyDestructiveInventory(event.getInventory())) {
                 event.setCancelled(true);
             } else {
@@ -235,6 +236,19 @@ public class ArtifactListener implements Listener {
 
         if (artifact != null) {
             Bukkit.getPluginManager().callEvent(new ArtifactDestructionEvent(item, artifact));
+        }
+    }
+
+    @EventHandler
+    public void onEntityDamageEvent(EntityDamageEvent event) {
+        Entity entity = event.getEntity();
+
+        if (entity instanceof Item) {
+            if (ArtifactManager.getArtifact((Item) entity) != null) {
+                event.setCancelled(true);
+
+                Bukkit.broadcastMessage("Protected an artifact lol");
+            }
         }
     }
 

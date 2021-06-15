@@ -5,6 +5,7 @@ import io.github.arleycht.SMP.util.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Entity;
@@ -27,9 +28,17 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class YumiArtifact implements IArtifact {
     public static final int KNOCKBACK_FORCE = 3;
+
     public static final double AOE_KNOCKBACK_RADIUS = 8.0;
+
     public static final double AOE_KNOCKBACK_FORCE = 2.0;
-    public static final double SELF_MULTIPLIER = 1.5;
+    public static final double VERTICAL_MULTIPLIER = 1.0;
+    public static final double HORIZONTAL_MULTIPLIER = 1.5;
+
+    public static final double SELF_FORCE = 2.5;
+    public static final double SELF_VERTICAL_MULTIPLIER = 1.0;
+    public static final double SELF_HORIZONTAL_MULTIPLIER = 2.0;
+
     public static final double AOE_KNOCKBACK_RADIUS_SQUARED = AOE_KNOCKBACK_RADIUS * AOE_KNOCKBACK_RADIUS;
 
     private final String artifactName;
@@ -114,34 +123,51 @@ public class YumiArtifact implements IArtifact {
                         continue;
                     }
 
-                    double distanceSquared = entity.getLocation().distance(location);
-
-                    if (distanceSquared < AOE_KNOCKBACK_RADIUS_SQUARED) {
-                        double keepPercentage = 1.0 - Math.sqrt(distanceSquared / AOE_KNOCKBACK_RADIUS_SQUARED);
-
-                        Vector effectivePosition = entity.getLocation().toVector();
-                        Vector dir = effectivePosition.subtract(location.toVector());
-
-                        dir.normalize();
-                        dir.multiply(AOE_KNOCKBACK_FORCE * keepPercentage);
-
-                        if (entity.getUniqueId() == shooterUUID) {
-                            dir.multiply(SELF_MULTIPLIER);
-                        }
-
-                        try {
-                            dir.checkFinite();
-                        } catch (IllegalArgumentException ignored) {
-                            continue;
-                        }
-
-                        Vector velocity = entity.getVelocity();
-
-                        velocity.add(dir);
-
-                        entity.setVelocity(velocity);
+                    if (entity.equals(event.getHitEntity())) {
+                        continue;
                     }
+
+                    double distanceSquared = entity.getLocation().distanceSquared(location);
+                    double keepPercentage = 1.0 - Math.sqrt(distanceSquared / AOE_KNOCKBACK_RADIUS_SQUARED);
+
+                    if (keepPercentage < 0.0) {
+                        continue;
+                    }
+
+                    Vector dir = entity.getLocation().toVector().subtract(location.toVector());
+
+                    dir.normalize();
+
+                    Vector velocityAdd = dir.clone().multiply(keepPercentage);
+
+                    if (entity.getUniqueId() == shooterUUID) {
+                        velocityAdd.setY(velocityAdd.getY() * SELF_VERTICAL_MULTIPLIER);
+                        velocityAdd.setX(velocityAdd.getX() * SELF_HORIZONTAL_MULTIPLIER);
+                        velocityAdd.setZ(velocityAdd.getZ() * SELF_HORIZONTAL_MULTIPLIER);
+
+                        velocityAdd.multiply(SELF_FORCE);
+                    } else {
+                        velocityAdd.setY(velocityAdd.getY() * VERTICAL_MULTIPLIER);
+                        velocityAdd.setX(velocityAdd.getX() * HORIZONTAL_MULTIPLIER);
+                        velocityAdd.setZ(velocityAdd.getZ() * HORIZONTAL_MULTIPLIER);
+
+                        velocityAdd.multiply(AOE_KNOCKBACK_FORCE);
+                    }
+
+                    try {
+                        dir.checkFinite();
+                    } catch (IllegalArgumentException ignored) {
+                        continue;
+                    }
+
+                    Vector velocity = entity.getVelocity().add(velocityAdd);
+
+                    entity.setVelocity(velocity);
+
+                    entity.setFallDistance(0.0f);
                 }
+
+                projectile.getWorld().playSound(location, Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1.0f, 1.0f);
             }, 0L);
         }
     }
@@ -159,7 +185,8 @@ public class YumiArtifact implements IArtifact {
     @Override
     public String[] getLore() {
         return new String[]{
-                "Fujin Yumi"
+                "Fujin Yumi, a legendary artifact bow.",
+                "Deals great knockback and grants the wielder higher speed and jumps."
         };
     }
 

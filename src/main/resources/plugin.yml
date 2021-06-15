@@ -2,10 +2,10 @@ name: DanSMP
 version: 1.0
 api-version: 1.13
 main: io.github.arleycht.SMP.DanSMP
-loadbefore:
-  - ProtocolLib
-depend:
-  - ProtocolLib
+#loadbefore:
+#  - ProtocolLib
+#depend:
+#  - ProtocolLib
 commands:
   dansmp:
     description: The DanSMP command

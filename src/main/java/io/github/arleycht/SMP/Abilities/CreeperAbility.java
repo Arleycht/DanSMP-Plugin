@@ -1,16 +1,12 @@
 package io.github.arleycht.SMP.Abilities;
 
-import com.comphenix.packetwrapper.WrapperPlayServerNamedSoundEffect;
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.events.ListenerPriority;
-import com.comphenix.protocol.events.PacketAdapter;
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.events.PacketEvent;
 import io.github.arleycht.SMP.Abilities.Shared.DeathMessageManager;
 import io.github.arleycht.SMP.util.Cooldown;
 import io.github.arleycht.SMP.util.Util;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
@@ -37,7 +33,7 @@ public class CreeperAbility extends Ability {
 
     private final Cooldown GENERATION_COOLDOWN = new Cooldown(20.0 * 60.0);
 
-    private PacketAdapter packetAdapter;
+    //private PacketAdapter packetAdapter;
 
     @Override
     public void initialize() {
@@ -45,7 +41,7 @@ public class CreeperAbility extends Ability {
 
         DeathMessageManager.setDeathMessages(this, ABILITY_DEATH_MESSAGES);
 
-        if (packetAdapter != null) {
+        /*if (packetAdapter != null) {
             ProtocolLibrary.getProtocolManager().removePacketListener(packetAdapter);
         }
 
@@ -94,7 +90,7 @@ public class CreeperAbility extends Ability {
             }
         };
 
-        ProtocolLibrary.getProtocolManager().addPacketListener(packetAdapter);
+        ProtocolLibrary.getProtocolManager().addPacketListener(packetAdapter);*/
     }
 
     @Override

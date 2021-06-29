@@ -24,6 +24,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
+import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.AbstractHorseInventory;
@@ -240,14 +241,21 @@ public class ArtifactListener implements Listener {
     }
 
     @EventHandler
+    public void onPlayerItemBreakEvent(PlayerItemBreakEvent event) {
+        IArtifact artifact = ArtifactManager.getArtifact(event.getBrokenItem());
+
+        if (artifact != null) {
+            Bukkit.getPluginManager().callEvent(new ArtifactDestructionEvent(null, artifact));
+        }
+    }
+
+    @EventHandler
     public void onEntityDamageEvent(EntityDamageEvent event) {
         Entity entity = event.getEntity();
 
         if (entity instanceof Item) {
             if (ArtifactManager.getArtifact((Item) entity) != null) {
                 event.setCancelled(true);
-
-                Bukkit.broadcastMessage("Protected an artifact lol");
             }
         }
     }

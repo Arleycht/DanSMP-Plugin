@@ -152,6 +152,7 @@ public class DanSMP extends JavaPlugin {
         AbilityRegistry.registerAbility("Brandon", LightningAbility.class, this);
         AbilityRegistry.registerAbility("Rikupam", GhostAbility.class, this);
         AbilityRegistry.registerAbility("jerry_jery", SlimeAbility.class, this);
+        AbilityRegistry.registerAbility("Mario", HuntAbility.class, this);
     }
 
     private void initializeArtifacts() {
